@@ -45,11 +45,14 @@ def _encode(value: Any) -> Any:
 
 def export(db: Session, account: Account, workspace_id: UUID, mode: str = "full") -> dict:
     db.rollback()
+    # One consistent read snapshot for every table and every original. The isolation level must be set
+    # before the first statement of the transaction, so it comes before the access check.
+    db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
+    isolation = db.execute(text("SHOW transaction_isolation")).scalar_one()
     grant = load_grant(db, workspace_id, account)
     if "archive.export" not in grant.capabilities:
+        db.rollback()
         raise not_permitted("Exporting a workspace archive needs the archive.export grant.", details={"required_capability": "archive.export"})
-    # One consistent read snapshot for every table and every original.
-    db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
     ws = db.get(Workspace, workspace_id)
     if ws is None or ws.active_container_id is None:
         raise not_found("workspace", workspace_id)
@@ -79,7 +82,8 @@ def export(db: Session, account: Account, workspace_id: UUID, mode: str = "full"
         "complete": mode == "full" and not reasons, "incomplete_reasons": reasons,
         "workspace": {"logical_id": str(ws.id), "name": ws.name, "data_label": ws.data_label},
         "container": {"id": str(container.id), "origin": container.origin, "provenance": container.provenance},
-        "snapshot": {"sequence": ws.sequence, "taken_at": dt.datetime.now(dt.UTC).isoformat(), "exported_by": account.display_name},
+        "snapshot": {"sequence": ws.sequence, "taken_at": dt.datetime.now(dt.UTC).isoformat(), "exported_by": account.display_name,
+                     "isolation": isolation},
         "labels": {"data": ws.data_label, "contains_real_patient_data": False,
                    "signatures": "Demonstration records by fictional development identities; not institutionally authenticated."},
         "counts": {name: len(rows) for name, rows in tables.items()}, "excluded": EXCLUDED, "tables": tables, "originals": originals,

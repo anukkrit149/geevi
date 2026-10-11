@@ -1,0 +1,294 @@
+{
+  "label": "fictional",
+  "validation_status": "Clinical content unvalidated; workflow demonstration only.",
+  "time_anchor": "Day 0 = referral received. Relative days illustrate workflow only, not recommended clinical timing.",
+  "patients": {
+    "meera": {
+      "display_name": "Meera (fictional)",
+      "identifiers": [
+        {
+          "system": "geevi-demo-mrn",
+          "value": "GEEVI-DEMO-0001"
+        }
+      ],
+      "summary": "Fictional adult referred with a new AML presentation.",
+      "episode_title": "New AML presentation (fictional)"
+    },
+    "arun": {
+      "display_name": "Arun (fictional)",
+      "identifiers": [
+        {
+          "system": "geevi-demo-mrn",
+          "value": "GEEVI-DEMO-0002"
+        }
+      ],
+      "summary": "Fictional older adult referred with a new AML presentation.",
+      "episode_title": "New AML presentation (fictional)"
+    }
+  },
+  "research": {
+    "question_v1": {
+      "title": "Does structured new-case preparation reduce avoidable callbacks?",
+      "question": "For new referrals to the fictional service, is documented identity review, patient-goal recording and acknowledged handoff associated with fewer preparation callbacks?",
+      "scope": "Operational case-preparation workflow of the fictional AML service.",
+      "intended_use": "Inform a departmental preparation protocol and handoff SOP. Not for individual treatment recommendations."
+    },
+    "appraisal_v1": {
+      "population": "Invented adult new-case referrals (as reported in the synthetic note)",
+      "intervention": "Structured preparation packet with identity review and acknowledged handoff",
+      "comparator": "None reported",
+      "outcome": "Callbacks for missing information; completed handoffs",
+      "timepoint": "Before first planning visit",
+      "study_design": "Retrospective fictional audit (as reported)",
+      "findings": "The synthetic note reports fewer callbacks with documented identity review and more completed handoffs when explicitly accepted.",
+      "uncertainty": "Direction and size of any effect are unknown.",
+      "limitations": "Invented single-site data, no comparison group, no clinical outcomes."
+    },
+    "question_v2": {
+      "title": "Should caregiver contact be confirmed before handoff?",
+      "question": "Does confirming a caregiver contact before handoff reduce same-day delays?",
+      "scope": "Handoff step of the fictional preparation pathway.",
+      "intended_use": "Consider a revision of the departmental preparation protocol."
+    },
+    "appraisal_v2": {
+      "population": "Invented handoffs (as reported)",
+      "intervention": "Caregiver contact confirmed in advance",
+      "comparator": "Earlier period without confirmation",
+      "outcome": "Same-day delays",
+      "timepoint": "Day of handoff",
+      "study_design": "Fictional before-and-after audit (as reported)",
+      "findings": "The synthetic note reports fewer same-day delays with a confirmed contact.",
+      "uncertainty": "Confounding by period is likely.",
+      "limitations": "Invented data; not evidence for any clinical decision."
+    },
+    "question_insufficient": {
+      "title": "Does weekend scheduling change preparation completeness?",
+      "question": "Is weekend scheduling associated with preparation completeness?",
+      "scope": "Scheduling of preparation visits.",
+      "intended_use": "Exploratory; no protocol change proposed."
+    }
+  },
+  "protocol": {
+    "title": "New AML case preparation pathway (fictional workflow protocol)",
+    "scope": "Preparation of new AML referrals in the fictional service, from referral to the first planning visit.",
+    "v1": {
+      "requirements": [
+        {
+          "id": "REQ-IDENTITY",
+          "kind": "identity",
+          "text": "Patient identity and source-document association are reviewed for every baseline document.",
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": false
+          },
+          "watch": [
+            "reports/*"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-CONTEXT",
+          "kind": "context",
+          "text": "Baseline source reports (referral, blood panel, marrow, flow, cytogenetics) are received and source-verified.",
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": false
+          },
+          "watch": [
+            "reports/*",
+            "assessment"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-DISCUSSION",
+          "kind": "discussion",
+          "text": "Patient goals and preferences are discussed and documented by an authorised team member.",
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": false
+          },
+          "watch": [
+            "discussion"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-VENUE",
+          "kind": "operational",
+          "text": "The preparation visit takes place at the main-campus day unit.",
+          "branch": {
+            "default": "Main-campus day unit",
+            "alternate": "Satellite clinic appointment (requires an approved operational exception)"
+          },
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": true,
+            "exception_type": "operational"
+          },
+          "watch": [
+            "discussion"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-MOLECULAR",
+          "kind": "clinical_input",
+          "text": "The final molecular report is received and source-verified before the treatment-planning visit is scheduled.",
+          "gate": "step:STEP-PLANNING-VISIT",
+          "waiver": {
+            "allowed": true,
+            "exception_type": "clinical"
+          },
+          "watch": [
+            "reports/molecular"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        }
+      ],
+      "summary": "Initial pathway."
+    },
+    "v2": {
+      "requirements": [
+        {
+          "id": "REQ-IDENTITY",
+          "kind": "identity",
+          "text": "Patient identity and source-document association are reviewed for every baseline document.",
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": false
+          },
+          "watch": [
+            "reports/*"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-CONTEXT",
+          "kind": "context",
+          "text": "Baseline source reports (referral, blood panel, marrow, flow, cytogenetics) are received and source-verified.",
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": false
+          },
+          "watch": [
+            "reports/*",
+            "assessment"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-DISCUSSION",
+          "kind": "discussion",
+          "text": "Patient goals and preferences are discussed and documented by an authorised team member.",
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": false
+          },
+          "watch": [
+            "discussion"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-VENUE",
+          "kind": "operational",
+          "text": "The preparation visit takes place at the main-campus day unit.",
+          "branch": {
+            "default": "Main-campus day unit",
+            "alternate": "Satellite clinic appointment (requires an approved operational exception)"
+          },
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": true,
+            "exception_type": "operational"
+          },
+          "watch": [
+            "discussion"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-MOLECULAR",
+          "kind": "clinical_input",
+          "text": "The final molecular report is received and source-verified before the treatment-planning visit is scheduled.",
+          "gate": "step:STEP-PLANNING-VISIT",
+          "waiver": {
+            "allowed": true,
+            "exception_type": "clinical"
+          },
+          "watch": [
+            "reports/molecular"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        },
+        {
+          "id": "REQ-CAREGIVER",
+          "kind": "operational",
+          "text": "A caregiver contact for the handoff is confirmed and documented, or the patient's choice not to name one is recorded.",
+          "gate": "plan_approval",
+          "waiver": {
+            "allowed": false
+          },
+          "watch": [
+            "discussion"
+          ],
+          "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
+        }
+      ],
+      "summary": "Adds caregiver contact confirmation before handoff."
+    }
+  },
+  "sop": {
+    "title": "Case preparation and handoff SOP (fictional)",
+    "purpose": "Role-owned operational steps for preparing a new case and handing work to the care team. Steps create task specifications, not clinical orders.",
+    "escalation": "Fictional AML coordinator desk",
+    "steps": [
+      {
+        "id": "STEP-CONFIRM-VENUE",
+        "title": "Confirm appointment venue and time with the patient",
+        "role": "Care team",
+        "expected_evidence": "Confirmation note naming who was contacted"
+      },
+      {
+        "id": "STEP-PREP-VISIT",
+        "title": "Carry out the preparation visit checklist",
+        "role": "Care team",
+        "expected_evidence": "Attributed care record for the visit",
+        "depends_on": [
+          "STEP-CONFIRM-VENUE"
+        ]
+      },
+      {
+        "id": "STEP-PLANNING-VISIT",
+        "title": "Schedule the treatment-planning visit",
+        "role": "Care team",
+        "expected_evidence": "Scheduled planning visit",
+        "requires": [
+          "REQ-MOLECULAR"
+        ]
+      },
+      {
+        "id": "STEP-FOLLOWUP",
+        "title": "Arrange the routine follow-up review",
+        "role": "Coordinator",
+        "expected_evidence": "Scheduled follow-up obligation"
+      }
+    ]
+  },
+  "exceptions": {
+    "venue": {
+      "type": "operational",
+      "requirement_id": "REQ-VENUE",
+      "departure": "Hold the preparation visit at the satellite clinic nearer the patient's home.",
+      "rationale": "Patient preference documented in the discussion: long travel to the main campus; no change to any medical treatment rule."
+    },
+    "molecular": {
+      "type": "clinical",
+      "requirement_id": "REQ-MOLECULAR",
+      "departure": "Schedule the treatment-planning visit before the final molecular report is available.",
+      "rationale": "Requested for review; requires both the treating clinician and the independent reviewer under the fictional policy."
+    }
+  },
+  "public_references_note": "Public standards and datasets are listed separately in references/public-references.json and are never joined to a fictional chart."
+}

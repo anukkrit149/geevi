@@ -101,3 +101,13 @@ def test_demo_seeding_requires_dev_mode_and_creates_no_approvals(api, monkeypatc
     finally:
         monkeypatch.undo()
         get_settings.cache_clear()
+
+
+def test_packaged_runtime_copy_matches_the_inputs_and_carries_no_gold():
+    from app.core.config import PACKAGED_FIXTURES
+    assert not (PACKAGED_FIXTURES / "gold").exists()
+    for name in ("manifest.json", "scenario.json"):
+        assert (PACKAGED_FIXTURES / name).read_bytes() == (FIXTURES / name).read_bytes()
+    packaged = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (PACKAGED_FIXTURES / "inputs").iterdir()}
+    source = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (FIXTURES / "inputs").iterdir()}
+    assert packaged == source and len(packaged) == 16

@@ -62,3 +62,28 @@ def test_session_reports_development_identity_and_no_secrets(api):
     assert "password" not in str(session).lower()
     names = [i["username"] for i in api(None).get("/dev/identities")]
     assert names == ["rao", "sen", "mira", "isha", "operator"]
+
+
+def test_same_origin_writes_accept_only_the_host_the_request_was_sent_to(api, workspace, monkeypatch):
+    from app.core.config import get_settings
+    rao = api("rao")
+    post = lambda headers: rao.http.post(f"/api/v1/workspaces/{workspace}/notes", json={"command_id": str(uuid.uuid4()), "text": "x"},  # noqa: E731
+                                         headers=rao.headers(headers))
+    public = {"Origin": "https://geevi.example.app", "X-Forwarded-Host": "geevi.example.app"}
+    assert post(public).json()["error"]["code"] == "origin_rejected"  # off by default
+    monkeypatch.setenv("GEEVI_SAME_ORIGIN_WRITES", "true")
+    get_settings.cache_clear()
+    try:
+        assert post(public).status_code == 200
+        assert post({"Origin": "https://evil.example", "X-Forwarded-Host": "geevi.example.app"}).json()["error"]["code"] == "origin_rejected"
+        assert post({"Origin": "https://geevi.example.app.evil.example", "X-Forwarded-Host": "geevi.example.app"}).status_code == 403
+    finally:
+        monkeypatch.undo()
+        get_settings.cache_clear()
+
+
+def test_hosted_database_urls_are_normalised_to_the_psycopg_driver():
+    from app.core.config import Settings
+    assert Settings(database_url="postgresql://u:p@h/db?sslmode=require").database_url == "postgresql+psycopg://u:p@h/db?sslmode=require"
+    assert Settings(database_url="postgres://u:p@h/db").database_url == "postgresql+psycopg://u:p@h/db"
+    assert Settings(database_url="postgresql+psycopg://u@h/db").database_url == "postgresql+psycopg://u@h/db"

@@ -2,6 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from fastapi import Depends, Request
@@ -21,8 +22,15 @@ UNSAFE = {"POST", "PUT", "PATCH", "DELETE"}
 def check_origin(request: Request) -> None:
     """Writes must come from the documented same-origin frontend (or a non-browser client)."""
     origin = request.headers.get("origin")
-    if origin and origin not in get_settings().allowed_origins:
-        raise DomainError(403, "origin_rejected", "This request origin is not allowed to perform writes.")
+    settings = get_settings()
+    if not origin or origin in settings.allowed_origins:
+        return
+    if settings.same_origin_writes:
+        # A browser cannot forge Origin or Host on a cross-site request, so equality proves same-origin.
+        host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").split(",")[0].strip()
+        if host and urlsplit(origin).netloc == host:
+            return
+    raise DomainError(403, "origin_rejected", "This request origin is not allowed to perform writes.")
 
 
 def current_session(request: Request, db: Session = Depends(get_db)) -> AuthSession:

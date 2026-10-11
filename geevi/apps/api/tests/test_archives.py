@@ -32,6 +32,7 @@ def test_fresh_database_restore_reproduces_history_digests_geometry_and_exact_by
     s = _journey(api, workspace)
     archive = _export(api, workspace)
     assert archive["schema"] == "geevi-archive/1" and archive["kind"] == "full_backup" and archive["complete"] is True and archive["incomplete_reasons"] == []
+    assert archive["snapshot"]["isolation"] == "repeatable read"  # every table and original was read from one snapshot
     assert archive["labels"]["contains_real_patient_data"] is False and "password hashes" in archive["excluded"]
     flat = str({k: v for k, v in archive.items() if k != "originals"}).lower()
     assert "password_hash" not in flat and "token_hash" not in flat and "csrf" not in flat and "$argon2" not in flat

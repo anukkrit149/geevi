@@ -15,6 +15,8 @@ import json
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parents[3] / "fixtures" / "department-journey"
+# Runtime copy packaged with the API for hosts that deploy apps/api on its own. Inputs only, never gold.
+PACKAGED = Path(__file__).resolve().parents[1] / "app" / "demo_data"
 BANNER = "FICTIONAL DEMONSTRATION DOCUMENT - NOT A REAL PATIENT RECORD - NOT CLINICALLY VALIDATED"
 MRN = "geevi-demo-mrn"
 PATIENTS = {
@@ -361,6 +363,18 @@ def build(out: Path = OUT) -> dict:
     return manifest
 
 
+def package(source: Path = OUT, target: Path = PACKAGED) -> None:
+    import shutil
+    shutil.rmtree(target, ignore_errors=True)
+    (target / "inputs").mkdir(parents=True)
+    for name in ("manifest.json", "scenario.json"):
+        shutil.copyfile(source / name, target / name)
+    for item in sorted((source / "inputs").iterdir()):
+        shutil.copyfile(item, target / "inputs" / item.name)
+
+
 if __name__ == "__main__":
     result = build()
+    package()
     print(f"wrote {len(result['inputs'])} source inputs and {len(result['research'])} research notes to {OUT}")
+    print(f"packaged the runtime copy (inputs, manifest, scenario) in {PACKAGED}")

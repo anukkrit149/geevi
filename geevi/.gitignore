@@ -17,3 +17,6 @@ next-env.d.ts
 .next-e2e/
 .geevi-local/
 .gstack/
+.vercel/
+.vercel-credentials.json
+.env.*

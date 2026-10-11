@@ -3,13 +3,18 @@ from functools import lru_cache
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from app.core.config import get_settings
 
 
 @lru_cache
 def get_engine():
-    return create_engine(get_settings().database_url, pool_pre_ping=True, future=True)
+    settings = get_settings()
+    if settings.serverless:
+        # No server-side prepared statements: they do not survive a transaction-mode connection pooler.
+        return create_engine(settings.database_url, poolclass=NullPool, connect_args={"prepare_threshold": None})
+    return create_engine(settings.database_url, pool_pre_ping=True)
 
 
 @lru_cache

@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-from app.core.config import get_settings
+from app.core.config import PACKAGED_FIXTURES, get_settings
 from app.core.errors import DomainError
 from app.schemas.sources import DocumentUpload, PatientCreate, RelTime
 from app.services import sources
@@ -18,7 +18,9 @@ from app.services.dev_seed import require_dev_mode
 
 
 def _root() -> Path:
-    return get_settings().fixtures_dir.resolve()
+    """The repository fixture pack, or the copy of its inputs packaged with the API (never the test annotations)."""
+    configured = get_settings().fixtures_dir.resolve()
+    return configured if (configured / "manifest.json").is_file() else PACKAGED_FIXTURES.resolve()
 
 
 def manifest() -> dict:

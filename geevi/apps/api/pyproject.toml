@@ -31,6 +31,8 @@ default-groups = ["dev", "fixtures"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+# A SQLAlchemy warning usually means a setting was silently ignored (as an isolation level once was): fail on it.
+filterwarnings = ["error::sqlalchemy.exc.SAWarning"]
 
 [tool.ruff]
 line-length = 120
