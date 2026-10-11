@@ -20,3 +20,6 @@ next-env.d.ts
 .vercel/
 .vercel-credentials.json
 .env.*
+.hosted-demo-credentials.json
+.vercel
+.env*

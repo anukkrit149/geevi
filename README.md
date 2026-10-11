@@ -2,7 +2,7 @@
 
 A new full-stack application: **Next.js App Router / React / TypeScript** frontend, **FastAPI / Pydantic** backend,
 **PostgreSQL** with SQLAlchemy, Psycopg and Alembic. It implements
-`../docs/plans/2026-10-11-1137-feat-oncology-department-journey-plan.md` (revision 2, units U1–U14).
+[the implementation plan](docs/plans/2026-10-11-1137-feat-oncology-department-journey-plan.md) (revision 2, units U1–U14).
 
 > Everything here is fictional. Accounts are development identities, signatures are demonstration records, and no
 > clinical content is validated. Passing synthetic tests does not establish clinical validity.
@@ -18,6 +18,8 @@ A new full-stack application: **Next.js App Router / React / TypeScript** fronte
 | `docs/` | [Development setup](docs/development.md) · [Journey guide, evidence and limits](docs/department-journey-guide.md) |
 
 Quick start: see [docs/development.md](docs/development.md).
+Hosting: see [docs/deployment.md](docs/deployment.md). Next.js and FastAPI deploy together using Vercel Services,
+with a dedicated Neon PostgreSQL database. The hosted app is a password-protected fictional demonstration.
 
 The legacy vanilla prototype in `../product/` is a read-only reference. Nothing here imports it, reads its browser
 storage, or modifies it.

@@ -1,7 +1,5 @@
 # CI for the Geevi full-stack demonstration. Uses only committed lockfiles, migrations and the
-# generated API contract. This workflow assumes this folder is the repository root; if it lives
-# inside a larger repository, move this file to that repository's .github/workflows/ and set
-# `defaults.run.working-directory` to this folder.
+# generated API contract. Geevi is the repository root, so GitHub discovers this workflow directly.
 name: oncology-app-ci
 
 on:

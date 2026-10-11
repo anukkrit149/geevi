@@ -51,7 +51,7 @@ export function LoginForm() {
         <h2>Sign in</h2>
         {identities.data?.length ? (
           <>
-            <p className="small" id="identity-help">Choose a development identity, then enter its local password.</p>
+            <p className="small" id="identity-help">Choose a demonstration identity, then enter the password supplied by the app owner.</p>
             <div className="identity-pick" role="group" aria-describedby="identity-help">
               {identities.data.map((identity) => (
                 <button type="button" key={identity.username} className="btn" aria-pressed={username === identity.username} onClick={() => setUsername(identity.username)}>
@@ -65,7 +65,7 @@ export function LoginForm() {
         <ErrorSummary error={error} />
         <TextInput label="Username" value={username} onChange={setUsername} autoComplete="username" required />
         <TextInput label="Password" value={password} onChange={setPassword} type="password" autoComplete="current-password" required
-          hint="Fictional passwords are generated into the ignored local file apps/api/.dev-credentials.json by the seed script." />
+          hint="Ask the app owner for access to this fictional demonstration." />
         <Button variant="primary" type="submit" busy={busy}>Sign in</Button>
       </form>
     </main>
