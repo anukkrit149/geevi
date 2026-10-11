@@ -309,7 +309,9 @@ def render_png(spec: dict) -> bytes:
     from PIL import Image, ImageDraw, ImageFont
     image = Image.new("L", (900, 520), 244)
     draw = ImageDraw.Draw(image)
-    font = ImageFont.load_default()
+    # Use Pillow's bundled bitmap font: FreeType's default font rasterizes differently
+    # on macOS and Linux, which changes the source hash despite identical authored text.
+    font = ImageFont.load_default_imagefont()
     patient = PATIENTS[spec["patient"]]
     lines = [BANNER, "", spec["issuer"], f"Patient: {patient['display_name']}   Patient ID: {patient['identifiers'][0]['value']}",
              f"Accession: {spec['accession']}   Report: {spec['title']}", ""]
@@ -318,7 +320,8 @@ def render_png(spec: dict) -> bytes:
     for index, line in enumerate(lines):
         draw.text((40, 36 + index * 34), line, fill=20, font=font)
     buf = io.BytesIO()
-    image.save(buf, format="PNG", optimize=False, compress_level=6)
+    # Stored deflate blocks also avoid platform-specific compressor output.
+    image.save(buf, format="PNG", optimize=False, compress_level=0)
     return buf.getvalue()
 
 

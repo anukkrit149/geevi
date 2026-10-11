@@ -1,5 +1,6 @@
 .git/
 .pgdata/
+.pgdata
 .geevi-local/
 .gstack/
 .env*

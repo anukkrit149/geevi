@@ -1,6 +1,5 @@
 """U2: explicit legacy import into staging, original preservation and honest disclosure."""
 import hashlib
-import os
 import uuid
 from pathlib import Path
 
@@ -47,8 +46,12 @@ def tree_state(root: Path) -> dict:
 
 @pytest.fixture(autouse=True)
 def legacy_app_untouched():
-    before = tree_state(LEGACY_APP) if LEGACY_APP.exists() else {}
+    # A standalone checkout need not include the separate legacy prototype.
+    # Imports must neither modify it when present nor create it when absent.
+    existed = LEGACY_APP.exists()
+    before = tree_state(LEGACY_APP) if existed else {}
     yield
+    assert LEGACY_APP.exists() == existed, "imports must not create or remove the separate legacy app"
     assert (tree_state(LEGACY_APP) if LEGACY_APP.exists() else {}) == before, "the legacy app directory must never be modified"
 
 
@@ -166,4 +169,3 @@ def test_later_legacy_export_is_a_new_explicit_choice_not_a_merge(api, workspace
     assert any(r["legacy_kind"] == "tasks" for r in api("rao").get(f"{W(workspace)}/legacy-records"))
     discarded = op.post(f"{W(workspace)}/imports/{second['id']}/discard")
     assert discarded["status"] == "discarded" and discarded["staging_container_id"] is None
-    assert os.path.isdir(LEGACY_APP)
