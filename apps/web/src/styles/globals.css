@@ -40,8 +40,8 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .card-warn { border-color: #e4c98c; background: #fffaf0; }
 .card-head { display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap; margin-bottom: .6rem; }
 .grid { display: grid; gap: 1rem; }
-.grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-.grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); }
 .row { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .stack { display: flex; flex-direction: column; gap: .6rem; }
 .item { border-top: 1px solid var(--line); padding: .7rem 0; }
@@ -113,7 +113,7 @@ td { border-bottom: 1px solid var(--line); padding: .45rem .5rem; vertical-align
 .identity-pick button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
 
 @media (max-width: 860px) {
-  .shell { grid-template-columns: 1fr; }
+  .shell { grid-template-columns: minmax(0, 1fr); }
   .sidebar { position: static; height: auto; flex-direction: column; }
   .nav { flex-direction: row; flex-wrap: wrap; }
   .identity { margin-top: 0; }
