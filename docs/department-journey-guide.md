@@ -4,7 +4,7 @@ What the Geevi application demonstrates, how to walk through it, what was verifi
 does not establish.
 
 > Fictional data, development identities, demonstration signatures. Software correctness below is **not** clinical
-> validation. No clinical criterion, dose, treatment delivery or institutional qualification is entered or inferred.
+> validation. No treatment recommendation, dosing order or institutional qualification is inferred. Fictional reported treatment history is clearly labelled and separate from prescribing.
 
 ## 1. Walkthrough
 
@@ -14,11 +14,11 @@ still saves and submits it.
 
 | Flow | Who | Where | What happens |
 |---|---|---|---|
-| F1 | Rao | Research | Add the synthetic note to the evidence library, open a question, write an appraisal citing an exact passage, submit to Sen |
+| F1 | Rao | Research | Add an attributed published-reference brief to the evidence library, open a question, write an appraisal citing an exact passage, submit to Sen |
 | F1 | Sen | Today → question | Object with a rationale. Rao opens a successor revision; Sen approves it. Both decisions stay in the history |
 | F1 | Rao, Sen | Department | Protocol v1 draft with accepted evidence → Sen approves → Rao publishes. Same for the separate SOP |
-| F2 | Mira | Patients → Sources | Register Meera, receive each report, review identity, inspect each region in the original, verify or correct |
-| F2 | Mira, Rao | Profile | Expected input with owner and next action; clinician assessment; six-dimension profile, trends, unresolved items |
+| F2 | Mira | Patients → Reports | Register Meera, receive each report, review identity, inspect each region in the original, verify or correct |
+| F2 | Mira, Rao | Profile | Awaited investigations under Reports; clinician assessment, disease burden, treatment/response and trends under Clinical overview; earlier versions under Record history |
 | F3 | Mira, Rao | Decisions | Discussion; criterion-level applicability; operational venue exception requested and approved; clinical exception left pending for Sen; plan saved, submitted (frozen) and signed |
 | F4 | Mira, Isha | Care & follow-up | SOP tasks assigned and sent; Isha accepts and completes with evidence; scheduled event, then separate actual care; concern acknowledged, answered, reviewed |
 | F4 | Mira, Rao | Care & follow-up, Impact queue | Follow-up result arrives; Rao classifies and dispositions it; encounter decision "continue unchanged" keeps the same plan and creates the next obligation |
@@ -37,16 +37,16 @@ All commands were run locally on 11 October 2026 (macOS, toolchain in `developme
 | Check | Command | Result |
 |---|---|---|
 | Backend lint | `uv run ruff check app tests scripts` | clean |
-| Backend domain / HTTP / PostgreSQL | `uv run pytest tests` | **98 passed** |
+| Backend domain / HTTP / PostgreSQL | `uv run pytest tests` | **107 tests** (full suite verified again for this update) |
 | Migrations | `alembic upgrade head`, `downgrade 0005`, `upgrade head` on an empty database | applied both ways |
 | Contract | `pnpm contracts:check` | OpenAPI artifact and generated types current |
 | Frontend lint, types | `pnpm --dir apps/web lint`, `typecheck` | clean |
 | Frontend components | `pnpm --dir apps/web test` | **11 passed** |
-| Frontend production build | `pnpm --dir apps/web build` | compiled, 17 routes |
-| Browser journeys | `pnpm --dir apps/web exec playwright test` | **23 passed** |
+| Frontend production build | `pnpm --dir apps/web build` | compiled, 19 routes |
+| Browser journeys | `pnpm --dir apps/web exec playwright test` | **25 browser journeys** (includes clinician overview and post-login patient-link continuity) |
 | Manual browser pass | gstack browse (headless fallback), desktop / tablet / mobile widths | see section 5 |
 | Compose | `docker compose config` | valid; **stack not started** (no Docker daemon) |
-| CI workflow | — | written; **never executed** |
+| CI workflow | — | [Previous main CI passed](https://github.com/anukkrit149/geevi/actions/runs/38134598244); this change is verified again before deployment |
 | Clinical content review | — | **not performed**; content stays unvalidated |
 
 Backend tests run on a disposable PostgreSQL database with the real migrations. Browser tests run against the real
@@ -133,8 +133,7 @@ above. F03 is covered at HTTP/session level only. **E04** (cohort export), **F05
 ## 4. Implementation decisions worth knowing
 
 - **Location.** The application lives in its own folder `geevi/` (with `apps/web`, `apps/api` inside), as directed,
-  not at the repository root named in the plan. The CI workflow is at `geevi/.github/workflows/` and only runs if
-  `geevi/` is the repository root or the file is moved.
+  with Geevi itself as the independent GitHub repository root. The workflow is discovered at `.github/workflows/oncology-app-ci.yml`.
 - **Six Alembic revisions**, one per unit group, plus the append-only triggers; not one revision per unit.
 - **Read models are derived from the tables** (`app/schemas/auto.py`); request schemas are hand-written.
 - **Uploads are base64 JSON**, bounded by `GEEVI_MAX_UPLOAD_BYTES`, so every write is one idempotent command.
@@ -168,13 +167,16 @@ that had just been reopened.
   layouts. Other layouts and images need manual entry. There is no OCR or model.
 - **Development authentication only.** No SSO, real-user qualification, password policy, rate limiting or lockout.
 - **Signatures are demonstration records**, not institutionally authenticated signatures.
-- **API-only functions without a screen:** amend/withdraw an evidence source, revise/withdraw an exception request,
-  episode transfer, cancel/transfer/create a follow-up obligation, review a concern without closing it. All are
-  covered by backend tests.
-- **Compose and CI are unexecuted** (see section 2).
+- **API-only function without a screen:** episode transfer. Evidence amendment/withdrawal, exception revision/withdrawal, follow-up creation/transfer/cancellation and concern review without closure now have screens.
+- **Compose runtime is unexecuted**; the hosted Vercel demo and GitHub CI have been exercised.
 - **Concurrency in browser tests** is two authenticated sessions interleaved against the real server lock; true
   simultaneous commits are proven in the backend tests with threads.
 - **Archives** are single JSON documents with base64 originals; fine for small fictional data only.
 - **Not built:** institutional SSO, hospital/EHR/FHIR integration and write-back, cohort analytics and export,
-  prospective-study administration, clinical extraction evaluation, notifications outside the app, deployment,
+  prospective-study administration, clinical extraction evaluation, notifications outside the app,
   production security and operational backup.
+
+
+## Oncologist UX and evidence update
+
+See [the clinician walkthrough, source-depth notes, dataset model and usability study plan](oncologist-demo-and-ux.md). The synthetic research papers were replaced by cited, original evidence briefs. Patient documents remain fictional. Research metadata, full-text access and limitations are explicit; no systematic or current-guideline review is claimed. An isolated, prepared walkthrough is created through authenticated development-actor API commands, with simulated approvals, using `scripts/prepare-oncologist-demo.py`.

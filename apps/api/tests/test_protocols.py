@@ -87,7 +87,7 @@ def test_future_effective_approved_content_cannot_change(api, workspace):
     after = api("rao").get(f"{W(workspace)}/protocols/{pid}")["version"]
     assert after["content_digest"] == digest and after["requirements"][0]["text"].startswith("Patient identity")
     past = (datetime.now(UTC) - timedelta(days=3)).isoformat()
-    _, _, second = accepted_evidence(api, workspace, "v2", "research-caregiver-contact")
+    _, _, second = accepted_evidence(api, workspace, "v2", "viale-a-2020")
     other = api("rao").post(f"{W(workspace)}/protocols", protocol_body("v1", [second]))["target"]["id"]
     packet = api("rao").post(f"{W(workspace)}/protocols/{other}/submit", {"expected_revision": 1, "reviewer_username": "sen"})["data"]["packet_id"]
     decide(api, workspace, "sen", packet)
@@ -115,11 +115,11 @@ def test_successor_supersedes_only_when_effective_and_keeps_v1_intact(api, works
     _, _, appraisal = accepted_evidence(api, workspace)
     v1 = publish_protocol_v1(api, workspace, [appraisal])
     before = api("rao").get(f"{W(workspace)}/protocols/{v1}")["version"]
-    _, _, second = accepted_evidence(api, workspace, "v2", "research-caregiver-contact")
+    _, _, second = accepted_evidence(api, workspace, "v2", "viale-a-2020")
     v2, _ = publish_protocol_v2(api, workspace, v1, [appraisal, second])
     detail = api("rao").get(f"{W(workspace)}/protocols/{v2}")
     assert [(v["version_no"], v["lifecycle"]) for v in detail["family"]] == [(1, "superseded"), (2, "effective")]
     assert detail["proposal"]["status"] == "accepted" and "requirements" in detail["proposal"]["diff"] and detail["proposal"]["base_version_id"] == v1
     after = api("rao").get(f"{W(workspace)}/protocols/{v1}")["version"]
     assert after["content_digest"] == before["content_digest"] and after["requirements"] == before["requirements"]
-    assert [r["id"] for r in detail["version"]["requirements"]][-1] == "REQ-CAREGIVER"
+    assert [r["id"] for r in detail["version"]["requirements"]][-1] == "REQ-TRIAL-CONTEXT"

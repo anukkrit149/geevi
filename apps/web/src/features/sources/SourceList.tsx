@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PatientReportsReadiness } from "@/features/patients/PatientReportsReadiness";
 import { useRef, useState } from "react";
 import { Badge, Button, Card, Empty, ErrorSummary, Loading, Select, TextInput } from "@/components/ui";
 import { api, fileToBase64 } from "@/lib/api/client";
@@ -9,7 +10,7 @@ import { useAction } from "@/lib/api/useAction";
 import { day } from "@/lib/format";
 import { useWorkspace } from "@/lib/session/session";
 
-export const DOC_KINDS = [["referral", "Referral letter"], ["blood_panel", "Blood count panel"], ["marrow", "Bone marrow morphology"], ["flow", "Flow cytometry"],
+export const DOC_KINDS = [["treatment_summary", "Treatment course summary"], ["response_assessment", "Response assessment"], ["referral", "Referral letter"], ["blood_panel", "Blood count panel"], ["marrow", "Bone marrow morphology"], ["flow", "Flow cytometry"],
   ["cytogenetics", "Cytogenetics"], ["molecular", "Molecular panel"], ["organ_assessment", "Organ assessment"], ["other", "Other (manual entry only)"]] as const;
 
 export function SourceList({ workspaceId, patientId }: { workspaceId: string; patientId: string }) {
@@ -44,6 +45,7 @@ export function SourceList({ workspaceId, patientId }: { workspaceId: string; pa
 
   return (
     <>
+      <PatientReportsReadiness workspaceId={workspaceId} patientId={patientId} />
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
       <Card title="Source documents" testId="source-list">
         {docs.isLoading ? <Loading what="documents" /> : null}

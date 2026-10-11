@@ -1,6 +1,7 @@
 import { ResearchHome } from "@/features/research/ResearchHome";
 
-export default async function Page({ params }: { params: Promise<{ workspaceId: string }> }) {
+export default async function Page({ params, searchParams }: { params: Promise<{ workspaceId: string }>; searchParams: Promise<{ patient?: string }> }) {
   const p = await params;
-  return <ResearchHome workspaceId={p.workspaceId} />;
+  const search = await searchParams;
+  return <ResearchHome workspaceId={p.workspaceId} patientId={search.patient} />;
 }

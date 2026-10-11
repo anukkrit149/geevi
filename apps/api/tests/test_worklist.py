@@ -19,7 +19,7 @@ def test_today_shows_each_account_only_its_own_owned_work(api, workspace):
     request_exception(api, workspace, s["meera"], s["protocol"], "molecular")
     api("mira").post(f"{W(workspace)}/expected-inputs", {"patient_id": s["meera"], "artifact": "Final molecular report", "report_type": "molecular",
                                                         "owner_username": "mira", "next_action": "Chase the genetics laboratory"})
-    _, _, second = accepted_evidence(api, workspace, "v2", "research-caregiver-contact")
+    _, _, second = accepted_evidence(api, workspace, "v2", "viale-a-2020")
     publish_protocol_v2(api, workspace, s["protocol"], [s["appraisal"], second])
     kinds = lambda user: api(user).get(f"{W(workspace)}/today")["counts"]  # noqa: E731
     assert kinds("isha") == {"task": 1}

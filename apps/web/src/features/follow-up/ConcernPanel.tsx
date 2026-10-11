@@ -45,6 +45,7 @@ export function ConcernPanel({ workspaceId, patientId }: { workspaceId: string; 
                     ...cp(c), body: { command_id, expected_revision: c.revision, narrative: text[c.id] ?? "", to_service: "Fictional AML clinician on call", owner_username: "rao" } }), "Concern escalated to the clinician on call")}>Escalate to clinician</Button> : null}
                   {can("concern.review") ? <Button onClick={() => action.run(`review:${c.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/concerns/{concern_id}/review", {
                     ...cp(c), body: { command_id, expected_revision: c.revision, narrative: text[c.id] ?? "", close: true } }), "Concern reviewed and closed")}>Review and close</Button> : null}
+                  {can("concern.review") ? <Button onClick={() => action.run(`review-open:${c.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/concerns/{concern_id}/review", { ...cp(c), body: { command_id, expected_revision: c.revision, narrative: text[c.id] ?? "", close: false } }), "Clinical review recorded; concern remains open")}>Review and keep open</Button> : null}
                 </div>
               </div>
             ) : null}

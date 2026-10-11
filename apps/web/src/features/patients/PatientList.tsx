@@ -13,6 +13,7 @@ export function PatientList({ workspaceId }: { workspaceId: string }) {
   const patients = useWs(workspaceId, ["patients"], () => api.GET("/api/v1/workspaces/{workspace_id}/patients", { params: { path: { workspace_id: workspaceId } } }));
   const action = useAction(workspaceId);
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [form, setForm] = useState({ display_name: "", system: "geevi-demo-mrn", value: "", episode_title: "New AML presentation (fictional)", summary: "" });
   const set = (key: keyof typeof form) => (value: string) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -35,7 +36,8 @@ export function PatientList({ workspaceId }: { workspaceId: string }) {
       </div>
       {patients.isLoading ? <Loading what="patients" /> : null}
       <Card title="Patient list" testId="patient-list">
-        {patients.data?.length ? patients.data.map(({ patient, identifiers, episodes }) => (
+        <TextInput label="Find a patient" value={search} onChange={setSearch} hint="Search name, identifier, referral summary or episode." />
+        {patients.data?.length ? patients.data.filter(({ patient, identifiers, episodes }) => [patient.display_name, patient.summary, ...identifiers.map((i) => i.value), ...episodes.map((e) => e.title)].join(" ").toLowerCase().includes(search.toLowerCase())).map(({ patient, identifiers, episodes }) => (
           <div className="item" key={patient.id}>
             <div className="row">
               <Link className="item-title" href={`/w/${workspaceId}/patients/${patient.id}`}>{patient.display_name}</Link>

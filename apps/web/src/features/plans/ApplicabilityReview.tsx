@@ -16,10 +16,16 @@ const CHOICES = ["match", "difference", "unknown", "not_applicable"];
 
 function CriteriaEditor({ workspaceId, review, protocol }: { workspaceId: string; review: Review; protocol: Protocol }) {
   const action = useAction(workspaceId);
+  const profile = useWs(workspaceId, ["patient", review.patient_id, "profile", ""], () => api.GET("/api/v1/workspaces/{workspace_id}/patients/{patient_id}/profile", { params: { path: { workspace_id: workspaceId, patient_id: review.patient_id } } }));
   const [criteria, setCriteria] = useState<Criterion[]>(review.criteria as Criterion[]);
   const [base, setBase] = useState(review.revision);
   const update = (id: string, patch: Partial<Criterion>) => setCriteria((cs) => cs.map((c) => (c.requirement_id === id ? { ...c, ...patch } : c)));
   const body = (command_id: string, expected_revision: number) => ({ command_id, expected_revision, criteria: criteria as never });
+  const support = [
+    ...(profile.data?.dimensions.flatMap((d) => d.observations.map((o) => ({ kind: "observation_version", id: o.id, label: `${o.analyte}: ${o.value_text || words(o.result_state)}${o.specimen_label ? ` (${o.specimen_label})` : ""}` }))) ?? []),
+    ...(profile.data?.assessment ? [{ kind: "clinical_assessment", id: profile.data.assessment.id, label: `Clinical assessment v${profile.data.assessment.version_no}` }] : []),
+    ...(profile.data?.discussion ? [{ kind: "patient_discussion", id: profile.data.discussion.id, label: `Patient discussion v${profile.data.discussion.version_no}` }] : []),
+  ];
 
   async function save(): Promise<number | null> {
     const done = await action.run("save", (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/applicability/{review_id}/save", {
@@ -55,6 +61,7 @@ function CriteriaEditor({ workspaceId, review, protocol }: { workspaceId: string
             </div>
             <TextArea label={`Rationale for ${r.id}`} rows={2} value={c.rationale} onChange={(rationale) => update(r.id, { rationale })}
               hint="Required for ‘difference’ and ‘not applicable’. Unknown stays unknown: an exception never converts it." />
+            <details><summary>Link exact patient records supporting {r.id} ({c.supporting.length})</summary><p className="small">Select the verified findings or attributed assessment used for this judgment. A citation does not make an unknown criterion a match.</p>{support.map((s) => <label className="check" key={`${s.kind}-${s.id}`}><input type="checkbox" aria-label={`${r.id}: ${s.label}`} checked={c.supporting.some((x) => x.kind === s.kind && x.id === s.id)} onChange={(e) => update(r.id, { supporting: e.target.checked ? [...c.supporting, { kind: s.kind, id: s.id }] : c.supporting.filter((x) => x.kind !== s.kind || x.id !== s.id) })} />{s.label}</label>)}</details>
           </fieldset>
         );
       })}

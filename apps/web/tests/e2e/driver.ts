@@ -66,8 +66,8 @@ export async function signIn(browser: Browser, user: User): Promise<Page> {
   return page;
 }
 
-export async function login(page: Page, user: User): Promise<void> {
-  await page.goto("/login");
+export async function login(page: Page, user: User, destination = "/login"): Promise<void> {
+  await page.goto(destination);
   await expect(page.locator("form[data-ready='true']")).toBeVisible();
   await page.getByLabel("Username").fill(user);
   await page.getByLabel("Password").fill(credentials()[user]);
@@ -128,10 +128,10 @@ async function decide(ws: string, packetId: string) {
 
 export async function acceptedEvidence(ws: string, which: "v1" | "v2" = "v1"): Promise<{ question: string; appraisal: string }> {
   const rao = await as("rao");
-  const research = which === "v1" ? "research-preparation-audit" : "research-caregiver-contact";
+  const research = which === "v1" ? "eln-aml-2022" : "viale-a-2020";
   const e = entry(research);
   const question = (await rao.post(`${W(ws)}/research/questions`, SCENARIO.research[`question_${which}`])).target.id;
-  const source = (await rao.post(`${W(ws)}/research/sources`, { title: e.title, citation: e.citation, source_label: "synthetic", filename: "note.pdf", media_type: "application/pdf", content_base64: b64(research) })).target.id;
+  const source = (await rao.post(`${W(ws)}/research/sources`, { title: e.title, citation: e.citation, source_label: e.label, filename: "brief.pdf", media_type: "application/pdf", content_base64: b64(research) })).target.id;
   const passage = (await rao.get(`${W(ws)}/research/sources`)).find((s: any) => s.id === source).passages.find((p: any) => p.text.startsWith("Finding 1"));
   const appraisal = (await rao.post(`${W(ws)}/research/questions/${question}/appraisals`, { ...SCENARIO.research[`appraisal_${which}`], citations: [{ source_id: source, passage_id: passage.id }] })).target.id;
   await decide(ws, (await rao.post(`${W(ws)}/research/appraisals/${appraisal}/submit`, { expected_revision: 1, reviewer_username: "sen" })).data.packet_id);
@@ -159,7 +159,7 @@ export async function knowledge(ws: string): Promise<{ appraisal: string; protoc
 export async function publishV2(ws: string, v1: string, evidence: string[]): Promise<string> {
   const rao = await as("rao");
   const p = SCENARIO.protocol;
-  const v2 = (await rao.post(`${W(ws)}/protocols/${v1}/revise`, { rationale: "Add caregiver contact confirmation before handoff.", evidence })).target.id;
+  const v2 = (await rao.post(`${W(ws)}/protocols/${v1}/revise`, { rationale: "Add individual-context review before interpreting trial evidence.", evidence })).target.id;
   await rao.post(`${W(ws)}/protocols/${v2}/save`, { expected_revision: 1, title: p.title, scope: p.scope, summary: p.v2.summary, requirements: p.v2.requirements, evidence });
   await publish(ws, "protocols", v2, 2);
   return v2;

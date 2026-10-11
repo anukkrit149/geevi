@@ -1,0 +1,58 @@
+{
+  "input": "arun-treatment-summary",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0002",
+  "assertions": [
+    {
+      "analyte": "Treatment received",
+      "value_text": "Azacitidine plus venetoclax; first cycle documented in this fictional discharge summary",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Treatment period",
+      "value_text": "Day 8 to Day 35; dose and administration records are not supplied",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Treatment intent",
+      "value_text": "Disease-directed treatment, as stated by the treating team",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Treatment complications",
+      "value_text": "Febrile neutropenia on Day 20; admitted and treated; fever resolved before discharge",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Treatment modification",
+      "value_text": "Venetoclax interrupted during the admission, according to the discharge note; restart decision not supplied",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Current symptoms",
+      "value_text": "Fatigue; no fever at discharge, as recorded on Day 35",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": "Fictional recorded treatment history, not a prescription. Complications are reported events, not adjudicated causality."
+}

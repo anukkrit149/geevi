@@ -28,6 +28,26 @@ class SourceCreate(CommandBase):
     content_base64: str | None = None
 
 
+class ReferenceBrief(BaseModel):
+    id: str
+    title: str
+    citation: str
+    url: str
+    publication_date: str
+    source_type: str
+    question: str
+    population: str
+    intervention: str
+    comparator: str
+    outcomes: str
+    findings: str
+    limitations: str
+    applicability: str
+    license_note: str
+    search_terms: list[str]
+    access_status: str
+
+
 class SourceAmend(Revisioned):
     reason: str = Field(min_length=8)
     title: str | None = None

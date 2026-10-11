@@ -182,7 +182,7 @@ test("exact deep links work; wrong or cross-workspace links fail safely; sign-ou
   await expect(page).toHaveURL(/\/login$/);
   expect((await context.request.get(`/api/v1${W(a.ws)}/patients`)).status()).toBe(401);
   await page.goBack();
-  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).toHaveURL(/\/login\?returnTo=/);
   await expect(page.getByTestId("patient-name")).toHaveCount(0);
   // A different account in the same browser: no prior data is exposed and its own scope applies.
   await login(page, "operator");
