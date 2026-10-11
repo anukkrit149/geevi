@@ -125,6 +125,9 @@ def main():
         "expected_revision": api("rao").get(f"{base}/follow-ups?patient_id={arun}")[0]["revision"],
         "decision": "more_information", "actual_time": h.DAY(42), "rationale": "Fictional review: response measurements and recorded complication discussed. Additional recovery and molecular information is needed before the next treatment decision.",
         "next": {"purpose": "Review outstanding recovery and molecular information; document the next individual decision", "due": h.DAY(49), "owner_username": "mira"}}))
+    stage("arun_review_care", lambda: api("rao").post(f"{base}/patients/{arun}/care-events", {
+        "status": "performed", "actual_time": h.DAY(42), "plan_version_id": arun_plan,
+        "narrative": "Fictional response-review encounter: reviewed the dated treatment and marrow reports, discussed recorded complications and the uncertainty about response, and documented the need for additional recovery and molecular information before the next treatment decision. This encounter records a review, not chemotherapy administration."}))
     stage("arun_expected", lambda: api("mira").post(f"{base}/expected-inputs", {"patient_id": arun, "artifact": "Current blood count and treating-team response assessment", "report_type": "blood_panel", "owner_username": "mira", "next_action": "Obtain the recorded recovery results before the Day 49 review."}))
     stage("arun_question", lambda: api("rao").post(f"{base}/research/questions", {
         "title": "Response and harms after the documented first cycle: what evidence applies?", "question": "How do response definitions, adverse events and trial population limits inform the review of this fictional treated AML case?", "scope": "Response assessment, harms and individual applicability; distinguish trial outcomes from patient observations.",
