@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button, Card, Empty, ErrorSummary, Select, TextArea, TextInput } from "@/components/ui";
+import { WorkflowViews } from "@/components/workflow-views";
 import { ExceptionPanel } from "@/features/exceptions/ExceptionPanel";
 import { api } from "@/lib/api/client";
 import { useWs } from "@/lib/api/hooks";
@@ -54,12 +55,11 @@ function DiscussionPanel({ workspaceId, patientId }: { workspaceId: string; pati
 }
 
 export function Decisions({ workspaceId, patientId }: { workspaceId: string; patientId: string }) {
-  return (
-    <>
-      <DiscussionPanel workspaceId={workspaceId} patientId={patientId} />
-      <ApplicabilityReview workspaceId={workspaceId} patientId={patientId} />
-      <ExceptionPanel workspaceId={workspaceId} patientId={patientId} />
-      <PlanPanel workspaceId={workspaceId} patientId={patientId} />
-    </>
-  );
+  const props = { workspaceId, patientId };
+  return <WorkflowViews label="Plan workflow" initial="plan" views={[
+    { id: "plan", label: "Individual plan", content: <PlanPanel {...props} /> },
+    { id: "applicability", label: "Applicability", content: <ApplicabilityReview {...props} /> },
+    { id: "discussion", label: "Patient discussion", content: <DiscussionPanel {...props} /> },
+    { id: "exceptions", label: "Exceptions", content: <ExceptionPanel {...props} /> },
+  ]} />;
 }

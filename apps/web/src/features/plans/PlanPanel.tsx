@@ -61,6 +61,14 @@ function PlanEditor({ workspaceId, patientId, existing }: { workspaceId: string;
   return (
     <form data-testid="plan-editor" onSubmit={(e) => { e.preventDefault(); void save(); }}>
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
+      {reviews.isSuccess && discussions.isSuccess && (!accepted.length || !latestDiscussion) ? <div className="notice">
+        <strong>Before this plan can be submitted</strong>
+        <p className="small">Complete the relevant review and patient discussion. Your entries here stay in place while you switch views.</p>
+        <div className="row">
+          {!accepted.length ? <a href="#applicability">Review applicability</a> : null}
+          {!latestDiscussion ? <a href="#discussion">Document patient discussion</a> : null}
+        </div>
+      </div> : null}
       <Select label="Accepted applicability review to pin" value={applicabilityId} onChange={(applicability_id) => setDraft({ ...draft, applicability_id })}
         options={accepted.length ? accepted.map((r) => ({ value: r.id, label: `Applicability review v${r.version_no}` })) : [{ value: "", label: "No accepted applicability review yet" }]} />
       <p className="small">Patient discussion pinned: {latestDiscussion ? `version ${latestDiscussion.version_no} (${latestDiscussion.recorded_by_name})` : "none documented — required before submission"}</p>

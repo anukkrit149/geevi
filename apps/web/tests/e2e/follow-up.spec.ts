@@ -7,6 +7,7 @@ test("a missed review keeps an unknown outcome; a clinical timing change opens c
   const [mira, isha, rao] = await Promise.all((["mira", "isha", "rao"] as const).map((u) => signIn(browser, u)));
   const care = `/w/${s.ws}/patients/${s.meera}/care`;
   await mira.goto(care);
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   const panel = mira.getByTestId("follow-ups");
   await expect(panel).toContainText("authored by the signed plan");
   await panel.getByLabel("Appointment (relative day)").fill("14");
@@ -26,6 +27,7 @@ test("a missed review keeps an unknown outcome; a clinical timing change opens c
   await panel.getByText(/^History/).click();
   await expect(panel).toContainText("missed — Mira — Patient did not attend; the reason is not yet known. (outcome: unknown)");
   await rao.goto(`/w/${s.ws}/patients/${s.meera}/decisions`);
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-currency")).toContainText("review current");
 
   // Changing the AUTHORED clinical timing is not an administrative edit.
@@ -41,15 +43,18 @@ test("a missed review keeps an unknown outcome; a clinical timing change opens c
 
   // A concern can be escalated to a named demo service; it stays open and owned until reviewed.
   await mira.goto(care);
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByTestId("concerns").getByLabel("Concern as reported").fill("Patient asked whether the review can be done by phone.");
   await mira.getByTestId("concerns").getByRole("button", { name: "Record concern" }).click();
   await announced(mira, "Concern recorded");
   await isha.goto(care);
+  await isha.getByRole("tab", { name: "All sections", exact: true }).click();
   await isha.getByTestId("concerns").getByLabel("Response / review note").fill("Question is beyond the care team; needs the clinician.");
   await isha.getByTestId("concerns").getByRole("button", { name: "Escalate to clinician" }).click();
   await expect(isha.getByTestId("concern-status")).toContainText("escalated");
   await expect(isha.getByTestId("concern")).toContainText("owner Dr. Rao");
   await rao.goto(care);
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await rao.getByTestId("concerns").getByLabel("Response / review note").fill("Trying to close before any response exists.");
   await rao.getByTestId("concerns").getByRole("button", { name: "Review and close" }).click();
   await expect(rao.getByTestId("error-summary").first()).toHaveAttribute("data-error-code", "response_required");

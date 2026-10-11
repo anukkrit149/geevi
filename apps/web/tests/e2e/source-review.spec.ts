@@ -7,12 +7,14 @@ test("separate source reports: receive, quarantine, associate, inspect the exact
   await register(ws, "arun");
   const mira = await signIn(browser, "mira");
   await mira.goto(`/w/${ws}/patients/${meera}/sources`);
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
 
   // Receive the marrow report through the upload form.
   await mira.getByLabel("Original file").setInputFiles(input("meera-marrow"));
   await mira.getByLabel("Report type", { exact: true }).selectOption("marrow");
   await mira.getByRole("button", { name: "Receive document" }).click();
   await expect(mira.getByTestId("upload-result")).toContainText("pending — 4 candidate finding(s)");
+  await expect(mira.getByRole("link", { name: "Review received document", exact: true })).toHaveAttribute("href", /\/sources\/[0-9a-f-]{36}$/);
 
   // The same bytes again are refused; the stored original is kept.
   await mira.getByLabel("Original file").setInputFiles(input("meera-marrow"));
@@ -33,6 +35,7 @@ test("separate source reports: receive, quarantine, associate, inspect the exact
 
   // Marrow report: findings cannot be verified before identity review.
   await mira.goto(`/w/${ws}/patients/${meera}/sources`);
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByRole("link", { name: "Bone marrow morphology report" }).click();
   await expect(mira.getByTestId("source-canvas")).toHaveAttribute("data-rendered", "1");
   await expect(mira.getByTestId("candidate-Cellularity").getByRole("button", { name: "Verify" })).toHaveCount(0);

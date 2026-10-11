@@ -8,10 +8,12 @@ test("a returned handoff keeps its owner and reason; an administrative edit leav
   const [mira, isha, rao] = await Promise.all((["mira", "isha", "rao"] as const).map((u) => signIn(browser, u)));
   const care = `/w/${s.ws}/patients/${s.meera}/care`;
   await mira.goto(care);
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByTestId("task-STEP-CONFIRM-VENUE").getByRole("button", { name: "Send handoff" }).click();
   await expect(mira.getByTestId("task-status-STEP-CONFIRM-VENUE")).toContainText("sent");
 
   await isha.goto(care);
+  await isha.getByRole("tab", { name: "All sections", exact: true }).click();
   const task = isha.getByTestId("task-STEP-CONFIRM-VENUE");
   await task.getByRole("button", { name: "Mark received" }).click();
   await expect(isha.getByTestId("task-status-STEP-CONFIRM-VENUE")).toContainText("received");
@@ -36,6 +38,7 @@ test("a returned handoff keeps its owner and reason; an administrative edit leav
   await announced(mira, "Task updated");
   await expect(returned).toContainText("due Day 5");
   await rao.goto(`/w/${s.ws}/patients/${s.meera}/decisions`);
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-currency")).toContainText("review current");
 
   // External report: performer and transcribing account are recorded separately; time may be unknown.

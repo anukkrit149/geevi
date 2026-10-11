@@ -16,7 +16,7 @@ describe("ErrorSummary", () => {
     expect(document.activeElement).toBe(summary);
     expect(summary.getAttribute("data-error-code")).toBe("stale_dependency");
     expect(summary.textContent).toContain("This action was not applied");
-    expect(summary.textContent).toContain("Changed: reports/molecular — source.associated “Molecular panel” by Mira");
+    expect(summary.textContent).toContain("Changed: reports/molecular - source.associated “Molecular panel” by Mira");
     expect(summary.textContent).toContain("Cellularity is no longer current");
     expect(summary.textContent).toContain("Next: Review the listed changes");
     expect(summary.textContent).toContain("Your entries are kept.");
@@ -24,7 +24,7 @@ describe("ErrorSummary", () => {
 
   it("never claims success when the outcome is unknown", () => {
     render(<ErrorSummary error={new ApiError("network_unknown_outcome", "The server could not be reached, so the outcome is unknown.", 0)} />);
-    expect(screen.getByRole("alert").textContent).toContain("Not confirmed — nothing is shown as saved");
+    expect(screen.getByRole("alert").textContent).toContain("Not confirmed - nothing is shown as saved");
     expect(screen.getByRole("alert").textContent).toContain("applied at most once");
   });
 
@@ -67,6 +67,7 @@ describe("presentation helpers", () => {
   it("links worklist items to exact, workspace-scoped pages", () => {
     expect(hrefFor("w1", { kind: "impact", patient_id: "p1", target_kind: "impact_review", target_id: "i1" })).toBe("/w/w1/impacts");
     expect(hrefFor("w1", { kind: "source", patient_id: "p1", target_kind: "source_document", target_id: "d1" })).toBe("/w/w1/patients/p1/sources/d1");
+    expect(hrefFor("w1", { kind: "expected_input", patient_id: "p1", target_kind: "expected_input", target_id: "e1" })).toBe("/w/w1/patients/p1/sources#readiness");
     expect(hrefFor("w1", { kind: "review", patient_id: null, target_kind: "protocol_version", target_id: "v1" })).toBe("/w/w1/department/protocols/v1");
   });
 });
