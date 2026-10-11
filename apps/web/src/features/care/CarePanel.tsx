@@ -63,7 +63,7 @@ export function CarePanel({ workspaceId, patientId }: { workspaceId: string; pat
             <p className="small">Performed by {c.performer_name}{c.transcriber_name ? ` · transcribed from an external report by ${c.transcriber_name}` : ""} · recorded {when(c.recorded_at)}
               {" · "}under plan v{signed.find((v) => v.plan.id === c.plan_version_id)?.plan.version_no ?? "?"} (historical reference)</p>
           </div>
-        )) : <Empty>No care has been recorded.</Empty>}
+        )) : <Empty>No care events have been entered here. Treatment reported in uploaded documents is shown in the clinical overview.</Empty>}
         {can("care.record") && signed.length ? (
           <form onSubmit={async (e) => {
             e.preventDefault();

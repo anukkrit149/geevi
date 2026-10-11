@@ -341,7 +341,7 @@ test("F4 · SOP-derived handoffs, attributed actual care and a concern", async (
   await planned.getByLabel("Location").fill("Satellite clinic");
   await planned.getByRole("button", { name: "Schedule", exact: true }).click();
   await announced(isha, "Event scheduled");
-  await expect(isha.getByTestId("care-events")).toContainText("No care has been recorded.");
+  await expect(isha.getByTestId("care-events")).toContainText("No care events have been entered here.");
   // Actual care: partial, attributed to Isha, under the signed plan.
   const care = isha.getByTestId("care-events");
   await care.getByLabel("Status", { exact: true }).selectOption("partial");
