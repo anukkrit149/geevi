@@ -12,7 +12,7 @@ test("a missed review keeps an unknown outcome; a clinical timing change opens c
   await panel.getByLabel("Appointment (relative day)").fill("14");
   await panel.getByRole("button", { name: "Schedule", exact: true }).click();
   await announced(mira, "Follow-up scheduled (no delivery recorded)");
-  await expect(mira.getByTestId("care-events")).toContainText("No care has been recorded."); // scheduling is not delivery
+  await expect(mira.getByTestId("care-events")).toContainText("No care events have been entered here."); // scheduling is not delivery
   await panel.getByLabel("Reason (for reschedule, miss, transfer)").fill("Patient did not attend; the reason is not yet known.");
   await panel.getByRole("button", { name: "Mark missed" }).click();
   await announced(mira, "Marked missed (outcome unknown)");
