@@ -85,6 +85,7 @@ export function ProtocolDetail({ workspaceId, versionId }: { workspaceId: string
   const { can } = useWorkspace(workspaceId);
   const { session } = useSession();
   const detail = useWs(workspaceId, ["protocol", versionId], () => api.GET("/api/v1/workspaces/{workspace_id}/protocols/{version_id}", { params: { path: { workspace_id: workspaceId, version_id: versionId } } }));
+  const appraisals = useWs(workspaceId, ["appraisals", "all"], () => api.GET("/api/v1/workspaces/{workspace_id}/research/appraisals", { params: { path: { workspace_id: workspaceId } } }));
   if (detail.isLoading) return <Loading what="protocol version" />;
   if (!detail.data) return <div className="card" role="alert" data-testid="record-unavailable"><h1>Record not available</h1><p>This protocol version does not exist in this workspace.</p></div>;
   const { version: v, family, reviews, publications, proposal } = detail.data;
@@ -117,6 +118,7 @@ export function ProtocolDetail({ workspaceId, versionId }: { workspaceId: string
             ))}</tbody>
           </table></div>
           <p className="small">Supporting evidence: {v.evidence.length} accepted appraisal version(s).</p>
+          {(appraisals.data ?? []).filter((a) => (v.evidence as string[]).includes(a.id)).map((a) => <p key={a.id}><Link href={`/w/${workspaceId}/research/${a.question_id}`}>Read supporting appraisal v{a.version_no} and its citations</Link> · {String((a.content as Record<string, unknown>).findings ?? "")}{a.review_needed ? <Badge value="review_needed" /> : null}</p>)}
           <PublicationBar workspaceId={workspaceId} kind="protocols" version={v} evidence={v.evidence as string[]} />
         </Card>
       )}

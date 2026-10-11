@@ -17,24 +17,24 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
     <div className="field">
       <label htmlFor={id}>{label}</label>
       {children(id)}
-      {hint ? <p className="hint">{hint}</p> : null}
+      {hint ? <p id={`${id}-hint`} className="hint">{hint}</p> : null}
     </div>
   );
 }
 
 export function TextInput({ label, hint, value, onChange, ...rest }: { label: string; hint?: string; value: string; onChange: (v: string) => void } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value">) {
-  return <Field label={label} hint={hint}>{(id) => <input id={id} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />}</Field>;
+  return <Field label={label} hint={hint}>{(id) => <input id={id} aria-describedby={hint ? `${id}-hint` : undefined} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />}</Field>;
 }
 
 export function TextArea({ label, hint, value, onChange, rows = 3, ...rest }: { label: string; hint?: string; value: string; onChange: (v: string) => void; rows?: number } & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange" | "value">) {
-  return <Field label={label} hint={hint}>{(id) => <textarea id={id} rows={rows} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />}</Field>;
+  return <Field label={label} hint={hint}>{(id) => <textarea id={id} aria-describedby={hint ? `${id}-hint` : undefined} rows={rows} value={value} onChange={(e) => onChange(e.target.value)} {...rest} />}</Field>;
 }
 
 export function Select({ label, hint, value, onChange, options, ...rest }: { label: string; hint?: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] } & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "value">) {
   return (
     <Field label={label} hint={hint}>
       {(id) => (
-        <select id={id} value={value} onChange={(e) => onChange(e.target.value)} {...rest}>
+        <select id={id} aria-describedby={hint ? `${id}-hint` : undefined} value={value} onChange={(e) => onChange(e.target.value)} {...rest}>
           {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       )}
@@ -45,7 +45,7 @@ export function Select({ label, hint, value, onChange, options, ...rest }: { lab
 export function Card({ title, actions, children, testId, level = 2, tone }: { title: string; actions?: ReactNode; children: ReactNode; testId?: string; level?: 2 | 3; tone?: "plain" | "warn" }) {
   const Heading = level === 2 ? "h2" : "h3";
   return (
-    <section className={`card ${tone === "warn" ? "card-warn" : ""}`} data-testid={testId} aria-label={title}>
+    <section className={`card ${tone === "warn" ? "card-warn" : ""}`} id={testId} data-testid={testId} aria-label={title}>
       <header className="card-head">
         <Heading>{title}</Heading>
         {actions ? <div className="row">{actions}</div> : null}
@@ -75,7 +75,7 @@ function detailLines(error: ApiError): string[] {
   const lines: string[] = [];
   for (const gate of (d.gates as { requirement_id: string; message: string }[] | undefined) ?? []) lines.push(`${gate.requirement_id}: ${gate.message}`);
   for (const c of (d.changes as { scope?: string; reason?: string; last_change?: { event?: string; actor?: string; title?: string } }[] | undefined) ?? []) {
-    lines.push(c.reason ?? `Changed: ${c.scope?.split("/").slice(2).join("/")} — ${c.last_change?.event ?? "updated"}${c.last_change?.title ? ` “${c.last_change.title}”` : ""} by ${c.last_change?.actor ?? "another account"}`);
+    lines.push(c.reason ?? `Changed: ${c.scope?.split("/").slice(2).join("/")} - ${c.last_change?.event ?? "updated"}${c.last_change?.title ? ` “${c.last_change.title}”` : ""} by ${c.last_change?.actor ?? "another account"}`);
   }
   for (const c of (d.criteria as { requirement_id: string; message: string }[] | undefined) ?? []) lines.push(`${c.requirement_id}: ${c.message}`);
   for (const f of (d.fields as { field: string; message: string }[] | undefined) ?? []) lines.push(`${f.field}: ${f.message}`);
@@ -94,7 +94,7 @@ export function ErrorSummary({ error, onDismiss }: { error: ApiError | null; onD
   const lines = detailLines(error);
   return (
     <div ref={ref} className="error-summary" role="alert" tabIndex={-1} data-testid="error-summary" data-error-code={error.code}>
-      <p className="error-title">{error.outcomeUnknown ? "Not confirmed — nothing is shown as saved" : "This action was not applied"}</p>
+      <p className="error-title">{error.outcomeUnknown ? "Not confirmed - nothing is shown as saved" : "This action was not applied"}</p>
       <p>{error.message}</p>
       {lines.length ? <ul>{lines.map((line) => <li key={line}>{line}</li>)}</ul> : null}
       {error.nextAction ? <p><strong>Next:</strong> {error.nextAction}</p> : null}
@@ -151,5 +151,10 @@ export function Meta({ items }: { items: [string, ReactNode][] }) {
 }
 
 export function Loading({ what }: { what: string }) {
-  return <p className="empty" role="status">Loading {what}…</p>;
+  return <div className="loading-state" role="status" aria-busy="true"><p>Loading {what}…</p><div aria-hidden="true"><div className="skeleton" /><div className="skeleton" /><div className="skeleton" /></div></div>;
+}
+
+/** Native disclosure preserves form drafts and keyboard support while reducing visual load. */
+export function Disclosure({ title, children, open = false }: { title: string; children: ReactNode; open?: boolean }) {
+  return <details className="disclosure" open={open || undefined}><summary>{title}</summary><div className="disclosure-body">{children}</div></details>;
 }

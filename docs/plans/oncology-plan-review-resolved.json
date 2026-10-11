@@ -1,0 +1,127 @@
+{
+  "artifact": "docs/plans/2026-10-11-1137-feat-oncology-department-journey-plan.md",
+  "artifact_sha256": "96971f8573eeda44d8d836e9be5a1a70b87a4cdad04686375b5be9b7d0bcb028",
+  "revision": 2,
+  "status": "complete",
+  "local_personas_complete": 7,
+  "fixes_applied": 0,
+  "proposed_fixes_count": 0,
+  "decisions_count": 0,
+  "fyi_count": 0,
+  "retained_findings": [],
+  "dispositions": [],
+  "author_changes": [
+    "Replaced vanilla-extension architecture with user-directed new Next.js/FastAPI application.",
+    "Moved canonical persistence, actors, commands and approvals to FastAPI/PostgreSQL; defined sessions, resource access and API contracts.",
+    "Replaced all U1-U14 file/test targets, setup and verification; U3 now precedes legacy conversion U2.",
+    "Preserved R1-R34, F1-F6, AE1-AE6 and patient governance; R28 now specifies backend-enforced development identities.",
+    "Preserved old plan/review in history and revised coding prompt/README."
+  ],
+  "confidence_check": {
+    "depth": "Deep",
+    "trigger_count_by_section": {
+      "requirements": 0,
+      "sources": 0,
+      "technical_decisions": 0,
+      "open_questions": 0,
+      "technical_design": 0,
+      "implementation_units": 0,
+      "system_wide_impact": 0,
+      "risks_dependencies": 0
+    },
+    "critical_section_bonus": 1,
+    "candidate_threshold": 2,
+    "selected_sections": [],
+    "result": "No remaining section reaches strengthening threshold after architecture revision and review."
+  },
+  "document_verification": {
+    "requirements": 34,
+    "units": 14,
+    "dependencies": {
+      "unit_fields": "complete",
+      "unit_dependencies": {
+        "1": [],
+        "2": [
+          1,
+          3
+        ],
+        "3": [
+          1
+        ],
+        "4": [
+          3
+        ],
+        "5": [
+          1,
+          3
+        ],
+        "6": [
+          5
+        ],
+        "7": [
+          3,
+          6
+        ],
+        "8": [
+          7
+        ],
+        "9": [
+          8
+        ],
+        "10": [
+          9
+        ],
+        "11": [
+          7,
+          10
+        ],
+        "12": [
+          2,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "13": [
+          2,
+          12
+        ],
+        "14": [
+          12,
+          13
+        ]
+      },
+      "valid_topological_order": [
+        1,
+        3,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    "fences": "balanced",
+    "handoff_links": "resolved"
+  },
+  "application_checks": "Not run in planning-only task",
+  "application_changes": "No application source, manifests, migrations or tests were created/modified by this planning run.",
+  "coverage_limitation": {
+    "status": "not-run",
+    "reason": "Same-session bundled acpx transport was already demonstrated unavailable before document egress (npm ETARGET, shared transport); not retried for this revision.",
+    "prior_evidence": "docs/plans/history/vanilla-oncology-plan-review-evidence.json",
+    "independent_cross_model_corroboration": false
+  },
+  "original_evidence": "docs/plans/oncology-plan-review-evidence.json"
+}

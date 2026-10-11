@@ -3,7 +3,7 @@
   "private": true,
   "description": "Geevi oncology department journey (fictional full-stack demonstration; not clinically validated)",
   "packageManager": "pnpm@10.33.4",
-  "engines": { "node": ">=22" },
+  "engines": { "node": "24.x" },
   "scripts": {
     "db:start": "./scripts/dev-db.sh start",
     "db:stop": "./scripts/dev-db.sh stop",

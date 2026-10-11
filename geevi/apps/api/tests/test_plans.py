@@ -5,6 +5,19 @@ from app.services import command_service
 from tests.helpers import W, draft_plan, meera_planned, meera_ready, sign_plan, submit_plan, upload
 
 
+def test_signed_decision_context_preserves_the_assessment_known_at_that_decision(api, workspace):
+    s = meera_planned(api, workspace)
+    before = api("rao").get(f"{W(workspace)}/plans/{s['plan']}")
+    context = before["decision_context"]
+    assert context["assessment"] and context["findings"] and context["patient_goals"]
+    assert all(c["requirement_text"] for c in context["criteria"])
+    assert any(e["departure"] for e in context["exceptions"])
+    api("rao").post(f"{W(workspace)}/patients/{s['meera']}/assessments", {
+        "narrative": "A later clinical assessment with a different interpretation for review.", "dimension_notes": {"fitness": "Later assessment."}})
+    after = api("rao").get(f"{W(workspace)}/plans/{s['plan']}")
+    assert after["decision_context"] == context and after["approval"] == before["approval"]
+
+
 def test_save_submit_and_sign_are_separate_and_the_packet_is_exact(api, workspace):
     s = meera_ready(api, workspace)
     plan_id, body = draft_plan(api, workspace, s["meera"], s["applicability"], [s["venue"]])

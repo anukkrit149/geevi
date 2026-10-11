@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { WorkflowViews } from "@/components/workflow-views";
+import { PatientReportsReadiness } from "@/features/patients/PatientReportsReadiness";
 import { useRef, useState } from "react";
 import { Badge, Button, Card, Empty, ErrorSummary, Loading, Select, TextInput } from "@/components/ui";
 import { api, fileToBase64 } from "@/lib/api/client";
@@ -9,7 +11,7 @@ import { useAction } from "@/lib/api/useAction";
 import { day } from "@/lib/format";
 import { useWorkspace } from "@/lib/session/session";
 
-export const DOC_KINDS = [["referral", "Referral letter"], ["blood_panel", "Blood count panel"], ["marrow", "Bone marrow morphology"], ["flow", "Flow cytometry"],
+export const DOC_KINDS = [["treatment_summary", "Treatment course summary"], ["response_assessment", "Response assessment"], ["referral", "Referral letter"], ["blood_panel", "Blood count panel"], ["marrow", "Bone marrow morphology"], ["flow", "Flow cytometry"],
   ["cytogenetics", "Cytogenetics"], ["molecular", "Molecular panel"], ["organ_assessment", "Organ assessment"], ["other", "Other (manual entry only)"]] as const;
 
 export function SourceList({ workspaceId, patientId }: { workspaceId: string; patientId: string }) {
@@ -22,7 +24,7 @@ export function SourceList({ workspaceId, patientId }: { workspaceId: string; pa
   const [issuer, setIssuer] = useState("");
   const [accession, setAccession] = useState("");
   const [relation, setRelation] = useState("");
-  const [received, setReceived] = useState<string | null>(null);
+  const [received, setReceived] = useState<{ message: string; id: string | null } | null>(null);
 
   async function upload() {
     const file = fileRef.current?.files?.[0];
@@ -34,7 +36,7 @@ export function SourceList({ workspaceId, patientId }: { workspaceId: string; pa
         issuer: issuer || null, accession: accession || null, relation: (relation || null) as never },
     }), `Received ${file.name}`);
     if (result) {
-      setReceived(`${file.name}: ${String(result.data.association_status)} — ${String(result.data.candidate_count)} candidate finding(s) extracted.`);
+      setReceived({ message: `${file.name}: ${String(result.data.association_status)} — ${String(result.data.candidate_count)} candidate finding(s) extracted.`, id: result.target?.id ?? null });
       if (fileRef.current) fileRef.current.value = "";
       setIssuer("");
       setAccession("");
@@ -45,8 +47,10 @@ export function SourceList({ workspaceId, patientId }: { workspaceId: string; pa
   return (
     <>
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
-      <Card title="Source documents" testId="source-list">
+      <WorkflowViews label="Reports workflow" initial="documents" views={[
+        { id: "documents", label: "Source documents", content: <Card title="Source documents" testId="source-list">
         {docs.isLoading ? <Loading what="documents" /> : null}
+        {docs.error ? <div role="alert"><p>Documents could not be loaded.</p><Button onClick={() => docs.refetch()}>Try again</Button></div> : null}
         {docs.data?.length ? (
           <div className="table-wrap"><table>
             <thead><tr><th>Document</th><th>Issuer · accession</th><th>Received</th><th>Association</th><th>Original</th></tr></thead>
@@ -63,8 +67,9 @@ export function SourceList({ workspaceId, patientId }: { workspaceId: string; pa
             </tbody>
           </table></div>
         ) : docs.data ? <Empty>No documents received for this patient.</Empty> : null}
-      </Card>
-      {can("source.import") ? (
+      </Card> },
+        { id: "readiness", label: "Verification & gaps", content: <PatientReportsReadiness workspaceId={workspaceId} patientId={patientId} /> },
+        ...(can("source.import") ? [{ id: "receive", label: "Receive document", content: (
         <Card title="Receive a source document" testId="upload">
           <p className="small">The original bytes are stored unchanged with their SHA-256. PDF, PNG and JPEG only. A new document always starts unassociated.</p>
           <form onSubmit={(e) => { e.preventDefault(); void upload(); }}>
@@ -79,9 +84,10 @@ export function SourceList({ workspaceId, patientId }: { workspaceId: string; pa
             </div>
             <Button variant="primary" type="submit" busy={!!action.pending}>Receive document</Button>
           </form>
-          {received ? <p role="status" data-testid="upload-result">{received}</p> : null}
+          {received ? <div className="notice"><p role="status" data-testid="upload-result">{received.message}</p>{received.id ? <Link href={`/w/${workspaceId}/patients/${patientId}/sources/${received.id}`}>Review received document</Link> : null}</div> : null}
         </Card>
-      ) : null}
+      ) }] : []),
+      ]} />
     </>
   );
 }

@@ -8,6 +8,7 @@ import { useMembers, useWs } from "@/lib/api/hooks";
 import { useAction } from "@/lib/api/useAction";
 import { day, relDay, when, words } from "@/lib/format";
 import { useWorkspace } from "@/lib/session/session";
+import { PlanDecisionContext } from "./PlanDecisionContext";
 
 type PlanView = Schemas["PlanView"];
 type Draft = { applicability_id: string; exception_ids: string[]; intent: string; alternatives: string; rationale: string;
@@ -60,6 +61,14 @@ function PlanEditor({ workspaceId, patientId, existing }: { workspaceId: string;
   return (
     <form data-testid="plan-editor" onSubmit={(e) => { e.preventDefault(); void save(); }}>
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
+      {reviews.isSuccess && discussions.isSuccess && (!accepted.length || !latestDiscussion) ? <div className="notice">
+        <strong>Before this plan can be submitted</strong>
+        <p className="small">Complete the relevant review and patient discussion. Your entries here stay in place while you switch views.</p>
+        <div className="row">
+          {!accepted.length ? <a href="#applicability">Review applicability</a> : null}
+          {!latestDiscussion ? <a href="#discussion">Document patient discussion</a> : null}
+        </div>
+      </div> : null}
       <Select label="Accepted applicability review to pin" value={applicabilityId} onChange={(applicability_id) => setDraft({ ...draft, applicability_id })}
         options={accepted.length ? accepted.map((r) => ({ value: r.id, label: `Applicability review v${r.version_no}` })) : [{ value: "", label: "No accepted applicability review yet" }]} />
       <p className="small">Patient discussion pinned: {latestDiscussion ? `version ${latestDiscussion.version_no} (${latestDiscussion.recorded_by_name})` : "none documented — required before submission"}</p>
@@ -140,6 +149,7 @@ export function PlanPanel({ workspaceId, patientId }: { workspaceId: string; pat
             <span data-testid="plan-currency"><Badge value={current.currency.status} label={current.currency.status === "current" ? "review current" : "review needed"} /></span>
           </div>
           <p className="quote">{current.plan.intent}</p>
+          <details><summary>Review the patient context and rationale behind this signed plan</summary><PlanDecisionContext workspaceId={workspaceId} view={current} /></details>
           <Meta items={[["Signed by", current.approval?.recorded_by_name], ["Signed", when(current.approval?.recorded_at)],
             ["Exact packet digest", <span className="mono" key="d" data-testid="plan-digest">{current.approval?.target_digest}</span>],
             ["Protocol version", <Link key="p" href={`/w/${workspaceId}/department/protocols/${current.plan.protocol_version_id}`}>Open pinned protocol version</Link>],
@@ -217,6 +227,7 @@ export function PlanPanel({ workspaceId, patientId }: { workspaceId: string; pat
             <ErrorSummary error={action.error} />
             <p>You are signing exactly this frozen packet. The server re-checks every pinned input and watched scope when the signature is committed.</p>
             <p className="quote">{signing.plan.intent}</p>
+            <PlanDecisionContext workspaceId={workspaceId} view={signing} />
             <Meta items={[["Plan version", signing.plan.version_no], ["Digest", <span className="mono" key="d">{signing.packet?.target_digest}</span>],
               ["Obligations", (signing.plan.obligations as Record<string, any>[]).map((o) => `${o.purpose} — ${day(o.due)} — ${o.owner_username}`).join("; ")]]} />
             <p className="small">{signing.signature_notice}</p>

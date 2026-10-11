@@ -1,0 +1,69 @@
+{
+  "label": "proposed_research_schema",
+  "basis": "Original schema proposal informed by Beat AML repository metadata and mCODE; not a reproduction of the dataset dictionary or a conformance claim.",
+  "dataset": {
+    "accession": "string",
+    "release": "string",
+    "source_url": "uri",
+    "access_permission": "string",
+    "terms_verified_on": "date"
+  },
+  "participant": {
+    "research_subject_id": "string scoped to dataset",
+    "analysis_population_id": "string"
+  },
+  "specimen": {
+    "specimen_id": "string",
+    "research_subject_id": "foreign key",
+    "collection_time": "date/time with precision",
+    "tissue": "string",
+    "disease_context": "source-attributed string"
+  },
+  "assay": {
+    "assay_id": "string",
+    "specimen_id": "foreign key",
+    "method": "string",
+    "platform": "string",
+    "quality_status": "explicit reported or missing state",
+    "run_version": "string"
+  },
+  "molecular_result": {
+    "assay_id": "foreign key",
+    "gene_or_feature": "string",
+    "result": "reported value",
+    "units": "string or null",
+    "missing_reason": "string or null"
+  },
+  "functional_measurement": {
+    "assay_id": "foreign key",
+    "compound": "string",
+    "concentration": "reported value plus units",
+    "response_metric": "named laboratory endpoint",
+    "measurement": "reported value",
+    "interpretation_boundary": "ex vivo assay, not individual clinical efficacy"
+  },
+  "clinical_annotation": {
+    "research_subject_id": "foreign key",
+    "source_id": "string",
+    "recorded_time": "date/time",
+    "field": "string",
+    "value": "source-attributed value",
+    "missing_state": "explicit state"
+  },
+  "analysis": {
+    "analysis_id": "string",
+    "dataset_release": "foreign key",
+    "cohort_definition": "string",
+    "endpoint_definition": "string",
+    "denominator": "integer with patient/specimen basis",
+    "method_version": "string",
+    "provenance": "source links"
+  },
+  "patient_care_boundary": "Research subjects remain separate from Geevi care patients. No clinical linkage is inferred.",
+  "references": [
+    {
+      "title": "Beat AML 2018 \u2014 research-data and assay-provenance brief",
+      "url": "https://www.nature.com/articles/s41586-018-0623-z"
+    }
+  ]
+}

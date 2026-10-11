@@ -1,0 +1,110 @@
+{
+  "date": "2026-10-11",
+  "mode": "non-interactive",
+  "classification": "unified-plan",
+  "artifact": "docs/plans/2026-10-11-1137-feat-oncology-department-journey-plan.md",
+  "reviewed_seed_sha256": "0866f80d32e5676a77bc767ad98cbe2096ad822673ac9fdcc3866952df4df43d",
+  "edit_permission": "Apply corrections to implementation and verification sections needed to satisfy the established Product Contract; preserve contract and user commitments.",
+  "returns": [
+    {
+      "reviewer": "coherence",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "feasibility",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "scope-guardian",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "product-lens",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "design-lens",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "security-lens",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "adversarial",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    }
+  ],
+  "cross_model": [
+    {
+      "lens": "product-lens",
+      "requested_target": "claude",
+      "requested_model": "claude-opus-5-5",
+      "reasoning": "high",
+      "result": "not-run",
+      "reason": "transport unavailable (pre-egress, shared): npm error code ETARGET",
+      "terminal_state": "done",
+      "document_egress": false,
+      "fold_in_artifact": false,
+      "result_diagnostic": "peer-job-runner: no artifact at /tmp/compound-engineering-501/ce-doc-review/oncology-499cdcb9da/product-lens-claude.json\npeer-job-runner: job 20261011T061734Z-efd17a0d: done (worker exited 0)\n",
+      "worker_log": "[cross-model-doc] reachable cross-model candidates for lens product-lens: claude (host codex excluded; up to 1 successful peer(s))\n[cross-model-doc] peer run: provider=claude route=claude model=claude-opus-5-5 (effort high) transport=acpx@0.19.4 lens=product-lens read-only least-privilege (idle 480s / hard 1200s); full document content egresses to this provider via this route\n[cross-model-doc] transport unavailable (pre-egress, shared): npm error code ETARGET\n",
+      "job_directory_cleanup": "complete"
+    },
+    {
+      "lens": "security-lens",
+      "requested_target": "claude",
+      "requested_model": "claude-opus-5-5",
+      "reasoning": "high",
+      "result": "not-run",
+      "reason": "transport unavailable (pre-egress, shared): npm error code ETARGET",
+      "terminal_state": "done",
+      "document_egress": false,
+      "fold_in_artifact": false,
+      "result_diagnostic": "peer-job-runner: no artifact at /tmp/compound-engineering-501/ce-doc-review/oncology-499cdcb9da/security-lens-claude.json\npeer-job-runner: job 20261011T061734Z-3c72e92b: done (worker exited 0)\n",
+      "worker_log": "[cross-model-doc] reachable cross-model candidates for lens security-lens: claude (host codex excluded; up to 1 successful peer(s))\n[cross-model-doc] peer run: provider=claude route=claude model=claude-opus-5-5 (effort high) transport=acpx@0.19.4 lens=security-lens read-only least-privilege (idle 480s / hard 1200s); full document content egresses to this provider via this route\n[cross-model-doc] transport unavailable (pre-egress, shared): npm error code ETARGET\n",
+      "job_directory_cleanup": "complete"
+    },
+    {
+      "lens": "adversarial",
+      "requested_target": "claude",
+      "requested_model": "claude-opus-5-5",
+      "reasoning": "high",
+      "result": "not-run",
+      "reason": "transport unavailable (pre-egress, shared): npm error code ETARGET",
+      "terminal_state": "done",
+      "document_egress": false,
+      "fold_in_artifact": false,
+      "result_diagnostic": "peer-job-runner: no artifact at /tmp/compound-engineering-501/ce-doc-review/oncology-499cdcb9da/adversarial-claude.json\npeer-job-runner: job 20261011T061734Z-c943b982: done (worker exited 0)\n",
+      "worker_log": "[cross-model-doc] reachable cross-model candidates for lens adversarial: claude (host codex excluded; up to 1 successful peer(s))\n[cross-model-doc] peer run: provider=claude route=claude model=claude-opus-5-5 (effort high) transport=acpx@0.19.4 lens=adversarial read-only least-privilege (idle 480s / hard 1200s); full document content egresses to this provider via this route\n[cross-model-doc] transport unavailable (pre-egress, shared): npm error code ETARGET\n",
+      "job_directory_cleanup": "complete"
+    },
+    {
+      "lens": "whole-doc",
+      "requested_target": "claude",
+      "requested_model": "claude-opus-5-5",
+      "reasoning": "high",
+      "result": "not-run",
+      "reason": "transport unavailable (pre-egress, shared): npm error code ETARGET",
+      "terminal_state": "done",
+      "document_egress": false,
+      "fold_in_artifact": false,
+      "result_diagnostic": "peer-job-runner: no artifact at /tmp/compound-engineering-501/ce-doc-review/oncology-499cdcb9da/whole-doc-claude.json\npeer-job-runner: job 20261011T061734Z-58e2b7c8: done (worker exited 0)\n",
+      "worker_log": "[cross-model-doc] reachable cross-model candidates for lens whole-doc: claude (host codex excluded; up to 1 successful peer(s))\n[cross-model-doc] peer run: provider=claude route=claude model=claude-opus-5-5 (effort high) transport=acpx@0.19.4 lens=whole-doc read-only least-privilege (idle 480s / hard 1200s); full document content egresses to this provider via this route\n[cross-model-doc] transport unavailable (pre-egress, shared): npm error code ETARGET\n",
+      "job_directory_cleanup": "complete"
+    }
+  ]
+}

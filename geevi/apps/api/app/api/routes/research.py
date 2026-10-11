@@ -9,11 +9,30 @@ from app.models.research import EvidenceAppraisal, EvidenceSource, ResearchQuest
 from app.models.sources import SourceBlob
 from app.schemas import research as s
 from app.schemas.commands import CommandResult
-from app.services import research, reviews
+from app.services import fixture_loader, research, reviews
 from app.services.command_service import Ctx
 
 router = APIRouter(tags=["research"])
 W = "/workspaces/{workspace_id}/research"
+
+
+@router.get(W + "/reference-pack", response_model=list[s.ReferenceBrief])
+def reference_pack(ctx: Ctx = Depends(reader)):
+    """Attributed published-evidence briefs, separate from fictional patient documents."""
+    return [e["reference"] for e in fixture_loader.manifest()["research"] if e.get("reference")]
+
+
+@router.post(W + "/reference-pack/{reference_id}/import", response_model=CommandResult)
+def import_reference(workspace_id: UUID, reference_id: str, body: s.CommandBase, cmd: Commander = Depends(commander)):
+    import base64
+    entry = next((e for e in fixture_loader.manifest()["research"] if e["id"] == reference_id and e.get("reference") and e["label"] == "public_reference"), None)
+    if entry is None:
+        raise DomainError(404, "reference_not_found", "This reference is not in the published evidence pack.")
+    source = s.SourceCreate(command_id=body.command_id, title=entry["title"], citation=entry["citation"], source_label="public_reference",
+                            filename=entry["file"].split("/")[-1], media_type="application/pdf",
+                            content_base64=base64.b64encode(fixture_loader.input_path(entry["file"]).read_bytes()).decode())
+    parsed = research.prepare_file(source.content_base64, source.media_type)
+    return cmd.run(workspace_id, "research.reference.import", source, lambda ctx: research.add_source(ctx, source, parsed), "evidence.author")
 
 
 def _source_view(ctx: Ctx, source: EvidenceSource) -> dict:
@@ -55,6 +74,11 @@ def add_source(workspace_id: UUID, body: s.SourceCreate, cmd: Commander = Depend
     return cmd.run(workspace_id, "research.source.add", body, lambda ctx: research.add_source(ctx, body, parsed), "evidence.author")
 
 
+@router.get(W + "/sources/{source_id}", response_model=s.EvidenceSourceOut)
+def get_source(source_id: UUID, ctx: Ctx = Depends(reader)):
+    return _source_view(ctx, ctx.get(EvidenceSource, source_id))
+
+
 @router.post(W + "/sources/{source_id}/amend", response_model=CommandResult)
 def amend_source(workspace_id: UUID, source_id: UUID, body: s.SourceAmend, cmd: Commander = Depends(commander)):
     parsed = research.prepare_file(body.content_base64, body.media_type)
@@ -74,6 +98,7 @@ def source_content(source_id: UUID, ctx: Ctx = Depends(reader)):
         raise DomainError(404, "original_unavailable", "No file is held for this evidence source.", target=("evidence_source", source.id))
     return Response(bytes(blob.data), media_type="application/pdf", headers={
         "Content-Disposition": "inline; filename=\"evidence\"", "Content-Security-Policy": "default-src 'none'; sandbox",
+        "Cache-Control": "no-store, private", "X-Content-Type-Options": "nosniff",
         "X-Content-SHA256": blob.sha256})
 
 

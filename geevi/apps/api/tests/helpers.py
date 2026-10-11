@@ -85,14 +85,14 @@ def decide(api, ws, user, packet_id, decision="approve", rationale=None, **kw):
                           {"expected_revision": packet["revision"], "decision": decision, "rationale": rationale}, **kw)
 
 
-def add_research_source(api, ws, research_id="research-preparation-audit"):
+def add_research_source(api, ws, research_id="eln-aml-2022"):
     entry = RESEARCH[research_id]
-    return api("rao").post(f"{W(ws)}/research/sources", {"title": entry["title"], "citation": entry["citation"], "source_label": "synthetic",
+    return api("rao").post(f"{W(ws)}/research/sources", {"title": entry["title"], "citation": entry["citation"], "source_label": entry["label"],
                                                          "filename": Path(entry["file"]).name, "media_type": "application/pdf",
                                                          "content_base64": b64(raw(research_id))})["target"]["id"]
 
 
-def draft_appraisal(api, ws, which="v1", research_id="research-preparation-audit"):
+def draft_appraisal(api, ws, which="v1", research_id="eln-aml-2022"):
     """Rao opens a question and drafts an appraisal citing a passage. Returns (question, source, appraisal) ids."""
     question = api("rao").post(f"{W(ws)}/research/questions", SCENARIO["research"][f"question_{which}"])["target"]["id"]
     source = add_research_source(api, ws, research_id)
@@ -109,7 +109,7 @@ def accept_appraisal(api, ws, appraisal_id):
     return packet
 
 
-def accepted_evidence(api, ws, which="v1", research_id="research-preparation-audit"):
+def accepted_evidence(api, ws, which="v1", research_id="eln-aml-2022"):
     question, source, appraisal = draft_appraisal(api, ws, which, research_id)
     accept_appraisal(api, ws, appraisal)
     return question, source, appraisal
@@ -131,7 +131,7 @@ def publish_protocol_v1(api, ws, evidence, **publish):
 
 def publish_protocol_v2(api, ws, v1_id, evidence):
     """Change proposal -> successor draft -> Sen approval -> Rao publication. Returns (v2 id, publish result)."""
-    v2 = api("rao").post(f"{W(ws)}/protocols/{v1_id}/revise", {"rationale": "Add caregiver contact confirmation before handoff.", "evidence": evidence})["target"]["id"]
+    v2 = api("rao").post(f"{W(ws)}/protocols/{v1_id}/revise", {"rationale": "Add individual-context review before interpreting trial evidence.", "evidence": evidence})["target"]["id"]
     api("rao").post(f"{W(ws)}/protocols/{v2}/save", {"expected_revision": 1, **protocol_body("v2", evidence)})
     packet = api("rao").post(f"{W(ws)}/protocols/{v2}/submit", {"expected_revision": 2, "reviewer_username": "sen"})["data"]["packet_id"]
     decide(api, ws, "sen", packet)

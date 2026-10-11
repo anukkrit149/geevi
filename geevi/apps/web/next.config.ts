@@ -10,6 +10,9 @@ const config: NextConfig = {
   distDir: process.env.GEEVI_NEXT_DIST ?? ".next",
   poweredByHeader: false,
   async rewrites() {
+    // Vercel Services routes /api/v1 directly to FastAPI before it reaches Next.js.
+    // Keep the proxy only for the standalone local/Compose frontend.
+    if (process.env.VERCEL === "1") return [];
     return [{ source: "/api/v1/:path*", destination: `${API_ORIGIN}/api/v1/:path*` }];
   },
   async headers() {

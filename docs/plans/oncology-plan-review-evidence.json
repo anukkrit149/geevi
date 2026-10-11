@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-11",
+  "revision": 2,
+  "mode": "non-interactive",
+  "classification": "unified-plan",
+  "artifact": "docs/plans/2026-10-11-1137-feat-oncology-department-journey-plan.md",
+  "reviewed_sha256": "96971f8573eeda44d8d836e9be5a1a70b87a4cdad04686375b5be9b7d0bcb028",
+  "settled_decision": "KTD1 user-directed: new Next.js/TypeScript frontend and FastAPI backend, chosen over extending vanilla JavaScript.",
+  "edit_permission": "Apply implementation/verification corrections necessary for the Product Contract; preserve selected stack and product scope.",
+  "returns": [
+    {
+      "reviewer": "coherence",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "feasibility",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "scope-guardian",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "product-lens",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "design-lens",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "security-lens",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    },
+    {
+      "reviewer": "adversarial",
+      "findings": [],
+      "residual_risks": [],
+      "deferred_questions": []
+    }
+  ],
+  "cross_model": {
+    "status": "not-run",
+    "reason": "Same-session bundled acpx transport was already demonstrated unavailable before document egress (npm ETARGET, shared transport); not retried for this revision.",
+    "prior_evidence": "docs/plans/history/vanilla-oncology-plan-review-evidence.json",
+    "independent_cross_model_corroboration": false
+  }
+}

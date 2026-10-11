@@ -36,13 +36,31 @@ def prepare_file(content_base64: str | None, media_type: str | None) -> dict | N
         pages = extraction.parse_pdf(data)
     except Exception:
         pages = []
-    passages = [{"id": f"p{page['number']}-{index}", "page": page["number"], "text": line["text"], "region": line["bbox"],
-                 "page_size": [page["width"], page["height"]]} for page in pages for index, line in enumerate(page["lines"], start=1)]
+    passages = []
+    for page in pages:
+        paragraphs = []
+        for line in page["lines"]:
+            box = line["bbox"]
+            if paragraphs and abs(box[0] - paragraphs[-1]["bbox"][0]) < 0.5 and 0 <= box[1] - paragraphs[-1]["bbox"][3] < 8:
+                paragraphs[-1]["text"] += " " + line["text"]
+                paragraphs[-1]["bbox"][2] = max(box[2], paragraphs[-1]["bbox"][2])
+                paragraphs[-1]["bbox"][3] = box[3]
+            else:
+                paragraphs.append({"text": line["text"], "bbox": list(box)})
+        passages.extend({"id": f"p{page['number']}-{index}", "page": page["number"], "text": line["text"], "region": line["bbox"],
+                         "page_size": [page["width"], page["height"]]} for index, line in enumerate(paragraphs, start=1))
     return {"data": data, "sha256": sha256_bytes(data), "passages": passages,
-            "limits": {"text_layer": bool(passages), "note": "Passages are text-layer lines; keyword search only, no semantic retrieval."}}
+            "limits": {"text_layer": bool(passages), "note": "Passages group adjacent text-layer lines with the same indentation; keyword search only, no semantic retrieval."}}
 
 
 def create_question(ctx: Ctx, body) -> dict:
+    if body.origin and body.origin.get("patient_id"):
+        from app.models.sources import Patient
+        try:
+            patient_id = UUID(str(body.origin["patient_id"]))
+        except ValueError as exc:
+            raise DomainError(422, "invalid_case_origin", "The research question must reference a patient in this workspace.") from exc
+        ctx.get(Patient, patient_id)
     question = ctx.new(ResearchQuestion, title=body.title.strip(), question=body.question.strip(), scope=body.scope.strip(),
                        intended_use=body.intended_use.strip(), owner_id=ctx.account.id, owner_name=ctx.account.display_name,
                        origin=body.origin or {})

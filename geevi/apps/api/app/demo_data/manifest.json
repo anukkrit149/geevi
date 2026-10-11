@@ -22,8 +22,8 @@
           "value": "GEEVI-DEMO-0002"
         }
       ],
-      "summary": "Fictional older adult referred with a new AML presentation.",
-      "episode_title": "New AML presentation (fictional)"
+      "summary": "Fictional AML case with a documented first treatment cycle and subsequent response assessment.",
+      "episode_title": "AML treatment and response review (fictional)"
     }
   },
   "inputs": [
@@ -31,8 +31,8 @@
       "id": "meera-referral",
       "file": "inputs/meera-referral.pdf",
       "media_type": "application/pdf",
-      "sha256": "3640972d072de7fa01a6afd47fdb3fdb6715dfbdfa71fe8034059e17241dfd7d",
-      "length": 2352,
+      "sha256": "548e497edcebeb6b730911490db34b38c1ecc7a5f5df84136c2a7d33ed42f668",
+      "length": 2361,
       "patient": "meera",
       "doc_kind": "referral",
       "title": "Referral letter",
@@ -73,8 +73,8 @@
       "id": "meera-marrow",
       "file": "inputs/meera-marrow.pdf",
       "media_type": "application/pdf",
-      "sha256": "64025dd1da32c06b84861ce606d167957452cc5d995d6a23b0e747b40334aced",
-      "length": 2461,
+      "sha256": "245c74210f26e51f79487f7c4e3e0be0aeb54a9351b642fdcf11e9a79118c0c2",
+      "length": 2471,
       "patient": "meera",
       "doc_kind": "marrow",
       "title": "Bone marrow morphology report",
@@ -304,8 +304,8 @@
       "id": "arun-echo-scan",
       "file": "inputs/arun-echo-scan.png",
       "media_type": "image/png",
-      "sha256": "9a3d21cbd00a00a2383888c55052a0a850df300c0c4bacf9707e2de4cd091077",
-      "length": 7381,
+      "sha256": "2a2a3d8f6e991adea48b149d5949e8b795ca5abbb7ecbe59671b4c20e08cad80",
+      "length": 468742,
       "patient": "arun",
       "doc_kind": "organ_assessment",
       "title": "External echocardiogram (scanned image)",
@@ -320,28 +320,172 @@
         "precision": "day",
         "basis": "fictional relative demonstration day"
       }
+    },
+    {
+      "id": "arun-treatment-summary",
+      "file": "inputs/arun-treatment-summary.pdf",
+      "media_type": "application/pdf",
+      "sha256": "0e3591f7a9436f1081635162f76dbef13b69c2d150d619c5ec8dacbb678faae1",
+      "length": 2623,
+      "patient": "arun",
+      "doc_kind": "treatment_summary",
+      "title": "Treatment course and discharge summary",
+      "issuer": "Fictional Northside Oncology",
+      "accession": "ONC-4410",
+      "stage": "treatment",
+      "label": "fictional",
+      "received_time": {
+        "value": 35,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "arun-response-assessment",
+      "file": "inputs/arun-response-assessment.pdf",
+      "media_type": "application/pdf",
+      "sha256": "63ef7c8b62e64afafef62f9797c6b66765d96a86232d754052c7b9adfc47ab32",
+      "length": 2506,
+      "patient": "arun",
+      "doc_kind": "response_assessment",
+      "title": "Post-cycle marrow and response review",
+      "issuer": "Fictional Northside Pathology",
+      "accession": "MAR-3380",
+      "stage": "response",
+      "label": "fictional",
+      "received_time": {
+        "value": 38,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
     }
   ],
   "research": [
     {
-      "id": "research-preparation-audit",
-      "file": "inputs/research-preparation-audit.pdf",
+      "id": "eln-aml-2022",
+      "file": "inputs/research-eln-aml-2022.pdf",
       "media_type": "application/pdf",
-      "sha256": "a93393594b8e805ec54c03e0a287fe78160e3d2f2aca75d11a5507b22facbfc4",
-      "length": 2204,
-      "citation": "Fictional Department Audit Group. Completeness of new-case preparation before the first planning visit. Synthetic teaching note, 2026.",
-      "title": "Synthetic audit note: new-case preparation completeness",
-      "label": "synthetic"
+      "sha256": "acf8cc9d0aaf977a4ee2cc4bff28818d90e5e313ef2350ed8ca3a5545dcbf579",
+      "length": 3599,
+      "citation": "D\u00f6hner H, Wei AH, Appelbaum FR, et al. Diagnosis and management of AML in adults: 2022 recommendations from an international expert panel on behalf of the ELN. Blood. 2022;140(12):1345\u20131377. doi:10.1182/blood.2022016867. PMID: 35797463. https://pubmed.ncbi.nlm.nih.gov/35797463/",
+      "title": "ELN 2022 AML recommendations \u2014 evidence brief",
+      "label": "public_reference",
+      "reference": {
+        "source_id": "eln-aml-2022",
+        "title": "ELN 2022 AML recommendations \u2014 evidence brief",
+        "citation": "D\u00f6hner H, Wei AH, Appelbaum FR, et al. Diagnosis and management of AML in adults: 2022 recommendations from an international expert panel on behalf of the ELN. Blood. 2022;140(12):1345\u20131377. doi:10.1182/blood.2022016867. PMID: 35797463. https://pubmed.ncbi.nlm.nih.gov/35797463/",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/35797463/",
+        "publisher_url": "https://doi.org/10.1182/blood.2022016867",
+        "publication_date": "2022-09-22",
+        "publication_date_note": "Journal issue publication date verified in PubMed; not an assertion about first-online publication.",
+        "source_type": "Expert-panel recommendations",
+        "question": "Which diagnostic, genetic-risk and response-assessment information should be reviewed before an AML case is discussed under a departmental pathway?",
+        "population": "Adults with AML; this is an expert recommendations document, not a randomized patient cohort.",
+        "intervention": "Not applicable: recommendations and classification framework.",
+        "comparator": "Not applicable: no experimental treatment comparison.",
+        "outcomes": "Updated disease and genetic-risk classification Genomic diagnostics and measurable residual disease assessment Revised response criteria and management recommendations",
+        "findings": "The 2022 panel update addresses advances in molecular classification, genomic diagnostics, measurable residual disease and AML therapies. Its abstract identifies revisions to genetic-risk classification and response criteria; it is a reference for documenting the framework used in a case assessment, not an automatic classifier.",
+        "limitations": "The PubMed citation and abstract were verified. The publisher full-text page returned a security-verification 403, so detailed tables and workup rules were not independently reviewed in this research pass. Published in 2022. This brief does not establish that the source is the latest guideline or that one risk framework applies to every treatment context. A recommendations document does not supply an individual patient's diagnosis, fitness assessment or treatment decision.",
+        "applicability": "Use as a sourced discussion prompt for an AML profile: diagnosis/classification basis, relevant molecular information, response assessment and unresolved inputs. The oncologist must record the actual assessment and chosen framework. Unknown or pending fictional results remain unknown or pending. A departmental protocol derived from this source still requires local scope, independent review, approval and a review date.",
+        "license_note": "PubMed reports \u00a92022 American Society of Hematology and marks the article free to read; that is not evidence of unrestricted redistribution. Ship an original attributed brief and links. Do not bundle the publisher PDF or reproduce its tables without verifying permission or an applicable reuse license.",
+        "access_status": "PubMed abstract accessible; publisher full text blocked by security verification during this pass.",
+        "search_terms": [
+          "acute myeloid leukemia ELN 2022 diagnosis genetic risk response assessment",
+          "AML genomic diagnostics measurable residual disease classification"
+        ],
+        "id": "eln-aml-2022"
+      }
     },
     {
-      "id": "research-caregiver-contact",
-      "file": "inputs/research-caregiver-contact.pdf",
+      "id": "viale-a-2020",
+      "file": "inputs/research-viale-a-2020.pdf",
       "media_type": "application/pdf",
-      "sha256": "97dba09595ac4938bbb55482a4925fad09f0043d0dda7d7acb16ea9c00f261b9",
-      "length": 1892,
-      "citation": "Fictional Department Audit Group. Caregiver contact confirmation and handoff delays. Synthetic teaching note, 2026.",
-      "title": "Synthetic audit note: caregiver contact confirmation",
-      "label": "synthetic"
+      "sha256": "d91a6a3ac4bf19ebe7f1d6976bcb909ec09f3abceb2fe436efba094399cdd676",
+      "length": 4720,
+      "citation": "DiNardo CD, Jonas BA, Pullarkat V, et al. Azacitidine and Venetoclax in Previously Untreated Acute Myeloid Leukemia. N Engl J Med. 2020;383(7):617\u2013629. doi:10.1056/NEJMoa2012971. PMID: 32786187. Trial: NCT02993523. https://pubmed.ncbi.nlm.nih.gov/32786187/",
+      "title": "VIALE-A \u2014 randomized-trial appraisal brief",
+      "label": "public_reference",
+      "reference": {
+        "source_id": "viale-a-2020",
+        "title": "VIALE-A \u2014 randomized-trial appraisal brief",
+        "citation": "DiNardo CD, Jonas BA, Pullarkat V, et al. Azacitidine and Venetoclax in Previously Untreated Acute Myeloid Leukemia. N Engl J Med. 2020;383(7):617\u2013629. doi:10.1056/NEJMoa2012971. PMID: 32786187. Trial: NCT02993523. https://pubmed.ncbi.nlm.nih.gov/32786187/",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/32786187/",
+        "publisher_url": "https://doi.org/10.1056/NEJMoa2012971",
+        "trial_url": "https://clinicaltrials.gov/study/NCT02993523",
+        "trial_api_url": "https://clinicaltrials.gov/api/v2/studies/NCT02993523",
+        "publication_date": "2020-08-13",
+        "source_type": "Phase 3 randomized controlled trial",
+        "question": "In previously untreated AML unsuitable for standard induction, what benefits, harms and applicability limits were reported for azacitidine plus venetoclax compared with azacitidine plus placebo?",
+        "population": "Original 2020 intention-to-treat analysis: 431 patients, 286 combination and 145 control; median age 76. Patients were previously untreated and considered ineligible for standard induction because of age 75 or older, coexisting conditions, or both.",
+        "intervention": "Azacitidine plus venetoclax, described for evidence appraisal only; no dosing instructions are included.",
+        "comparator": "Azacitidine plus placebo.",
+        "outcomes": "Primary endpoint in the original publication: overall survival Complete remission and composite complete remission Adverse events and serious adverse events",
+        "findings": "At median follow-up 20.5 months, median overall survival was 14.7 versus 9.6 months; hazard ratio for death 0.66, 95% confidence interval 0.52\u20130.85. Composite complete remission was 66.4% versus 28.3%. Grade 3 or higher febrile neutropenia occurred in 42% versus 19%; serious adverse events in 83% versus 73%. Benefits and harms should be appraised together.",
+        "limitations": "The original publication's abstract and trial identifier were verified; the full paper and supplements were not appraised in this pass. The study population was unsuitable for standard induction. Results cannot be generalized automatically to all newly diagnosed AML, an individual molecular subgroup, or a patient without a documented fitness assessment. Funded by AbbVie and Genentech. The brief is a starter appraisal, not a systematic review or current treatment recommendation. The current registry lists 443 actual enrollment, a later 2021 data cutoff and last update posted2026-06-11. These are distinct from the original 2020 paper's 431-person analysis; denominators and versions must not be merged.",
+        "applicability": "A patient-linked research question should record treatment history, clinician-assessed fitness, relevant comorbidity and unresolved information before judging applicability. In Geevi, applicability is an attributed clinician assessment. The existence of this evidence does not make either fictional patient eligible or prescribe a regimen. Use the trial record to check eligibility definitions and provenance. On 2026-10-11 the record was active, not recruiting; do not present it as an open enrollment option.",
+        "license_note": "PubMed reports Copyright \u00a9 2020 Massachusetts Medical Society. Bundle an original citation-linked summary, not the NEJM full text, figures or PDF. The public trial record is a separate source; public access to its data does not confer rights to redistribute the journal article.",
+        "access_status": "PubMed abstract accessible. ClinicalTrials.gov protocol data retrieved through its browser-accessible API; publisher full text was not retrieved.",
+        "registry_verified_on": "2026-10-11",
+        "search_terms": [
+          "AML previously untreated intensive induction ineligible VIALE-A overall survival harms",
+          "NCT02993523 eligibility azacitidine venetoclax"
+        ],
+        "id": "viale-a-2020"
+      }
+    },
+    {
+      "id": "beat-aml-2018",
+      "file": "inputs/research-beat-aml-2018.pdf",
+      "media_type": "application/pdf",
+      "sha256": "a22f4cf5d6e78f50fe0e320f2b3981e057414781fe108fc6d516639ee6c4b19e",
+      "length": 4560,
+      "citation": "Tyner JW, Tognon CE, Bottomly D, et al. Functional genomic landscape of acute myeloid leukaemia. Nature. 2018;562:526\u2013531. doi:10.1038/s41586-018-0623-z. https://www.nature.com/articles/s41586-018-0623-z",
+      "title": "Beat AML 2018 \u2014 research-data and assay-provenance brief",
+      "label": "public_reference",
+      "reference": {
+        "source_id": "beat-aml-2018",
+        "title": "Beat AML 2018 \u2014 research-data and assay-provenance brief",
+        "citation": "Tyner JW, Tognon CE, Bottomly D, et al. Functional genomic landscape of acute myeloid leukaemia. Nature. 2018;562:526\u2013531. doi:10.1038/s41586-018-0623-z. https://www.nature.com/articles/s41586-018-0623-z",
+        "url": "https://www.nature.com/articles/s41586-018-0623-z",
+        "publication_date": "2018-10-17",
+        "source_type": "Functional-genomic research cohort and dataset",
+        "question": "How can AML clinical annotations, genomic findings, gene expression and ex vivo drug-response assays be linked without treating research assays as clinical recommendations?",
+        "population": "The 2018 publication describes 672 tumor specimens collected from 562 patients with AML. Multiple specimens can belong to one patient; specimen and patient denominators differ.",
+        "intervention": "Research profiling with whole-exome sequencing, RNA sequencing and ex vivo drug-sensitivity analyses.",
+        "comparator": "Research comparisons across molecular states and assay-response patterns; no randomized clinical treatment comparator.",
+        "outcomes": "Molecular and expression associations with ex vivo drug sensitivity Linked clinical, genomic, transcriptomic and functional data",
+        "findings": "The source reports associations between molecular features and laboratory drug-response measurements and makes a linked AML research dataset available through named repositories and Vizome. This is useful for designing research data relationships, including patient, specimen, assay, molecular result and analysis provenance. It does not show that an ex vivo result predicts clinical benefit for an individual patient.",
+        "limitations": "Publisher abstract, data-availability section, copyright metadata and the named dbGaP entry were verified. Subscription full text was not read. Observational and laboratory associations are not randomized evidence of treatment efficacy; missing assays, multiple specimens and assay context must remain explicit. The 2018 publication's dbGaP accession phs001657.v1.p1 is superseded. The old record lists 583 consented subjects, distinct from the publication cohort; preserve release and analysis-population provenance. No participant-level data were downloaded. Data-access permission and applicable dataset terms must be checked before ingestion or redistribution.",
+        "applicability": "Use the study to shape a separate research dataset model: patient-to-specimen links, collection time, assay method, quality status, clinical annotation, access permission and analysis version. Keep ex vivo sensitivity measurements separate from clinical observations and patient care decisions. Begin with a data dictionary and public aggregate examples. Do not import research participants as Geevi patients or label the demo a clinically validated matching tool.",
+        "dataset_references": [
+          {
+            "name": "Original publication accession",
+            "url": "https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001657.v1.p1",
+            "access": "Individual-level data require dbGaP Authorized Access and the Data Use Certification. Public manifests, dictionaries and summary material are separately listed."
+          },
+          {
+            "name": "Latest accession linked by dbGaP",
+            "url": "https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/study.cgi?study_id=phs001657.v3.p1",
+            "access": "Link verified on the original accession page; the newer release's contents were not inspected."
+          },
+          {
+            "name": "Vizome 2018 additional files",
+            "url": "https://www.vizome.org/additional_figures_BeatAML.html",
+            "access": "Accessible project page links RNA-count and analysis-workflow material. Public accessibility is not a verified unrestricted redistribution license."
+          }
+        ],
+        "license_note": "Publisher metadata states 2018 Springer Nature Limited and the page presents subscription access plus a reprints/permissions route. No open redistribution license was verified. Ship an original attributed brief and repository links, not the paper or dataset. dbGaP data have separate authorized-access and disease-specific use conditions.",
+        "access_status": "Publisher abstract and data-availability text accessible; subscription full text not read. dbGaP and Vizome metadata pages accessible.",
+        "search_terms": [
+          "Beat AML functional genomics ex vivo drug sensitivity data dictionary",
+          "AML specimen assay provenance phs001657 clinical annotations"
+        ],
+        "id": "beat-aml-2018"
+      }
     }
   ]
 }

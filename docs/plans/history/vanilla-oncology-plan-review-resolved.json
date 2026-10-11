@@ -1,0 +1,44 @@
+{
+  "artifact": "docs/plans/2026-10-11-1137-feat-oncology-department-journey-plan.md",
+  "artifact_sha256": "a7eaa431bd30294efef2aec420af83b713db7db2fdf072876cd85b3ee4061418",
+  "status": "complete",
+  "local_personas_complete": 7,
+  "fixes_applied": 0,
+  "proposed_fixes_count": 0,
+  "decisions_count": 0,
+  "fyi_count": 0,
+  "retained_findings": [],
+  "dispositions": [],
+  "author_reference_correction": "Expanded two abbreviated supporting-source paths to existing full repo-relative paths; no contract/implementation change.",
+  "confidence_check": {
+    "depth": "Deep",
+    "risk_signals": [
+      "stateful approval boundaries",
+      "migration",
+      "persistence",
+      "cross-route workflow",
+      "source/import handling"
+    ],
+    "checklist_problems_by_section": {
+      "requirements": 0,
+      "sources": 0,
+      "technical_decisions": 0,
+      "open_questions": 0,
+      "technical_design": 0,
+      "implementation_units": 0,
+      "system_wide_impact": 0,
+      "risks_dependencies": 0
+    },
+    "critical_section_bonus": 1,
+    "candidate_threshold": 2,
+    "sections_selected": [],
+    "result": "No sections need strengthening after the three completed grounding/workflow reviews."
+  },
+  "coverage_limitation": "Additional cross-model judgment lenses and whole-document sweep did not run: bundled acpx dependency fetch returned npm ETARGET before document egress. All seven in-process personas completed.",
+  "verification": {
+    "planning_document_checks": "34 unique requirements, 14 unique units with required fields, internal ID ranges, balanced fences, linked handoff/supporting documents verified",
+    "application_checks": "Not run in planning-only task",
+    "application_changes": "None by this planning run"
+  },
+  "original_evidence": "docs/plans/oncology-plan-review-evidence.json"
+}

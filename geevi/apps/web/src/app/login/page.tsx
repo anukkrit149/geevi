@@ -1,5 +1,5 @@
 import { LoginForm } from "@/features/session/LoginForm";
 
-export default function LoginPage() {
-  return <LoginForm />;
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ returnTo?: string }> }) {
+  return <LoginForm returnTo={(await searchParams).returnTo} />;
 }

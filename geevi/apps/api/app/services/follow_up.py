@@ -137,6 +137,11 @@ def mark(ctx: Ctx, obligation_id: UUID, body, state: str) -> dict:
         raise blocked("reason_required", "Record the reason.", target=("follow_up_obligation", obligation.id))
     obligation.state = state
     _note(ctx, obligation, state, body.reason.strip(), outcome="unknown" if state == "missed" else None)
+    if state == "cancelled" and obligation.authored:
+        # Removing a duty authored by a signed plan needs the same scoped clinical review
+        # as changing its due time. Administrative obligations do not change clinical currency.
+        impacts.nominate_for_obligation_change(ctx, obligation, {"event": "obligation.cancelled", "obligation_id": str(obligation.id),
+                                                                "reason": body.reason.strip()})
     return target(obligation)  # a missed review records an unknown outcome; the duty stays owned
 
 
@@ -221,7 +226,7 @@ def decide(ctx: Ctx, obligation_id: UUID, body) -> dict:
     decision = ctx.new(EncounterDecision, obligation_id=obligation.id, encounter_id=encounter.id, patient_id=obligation.patient_id,
                        plan_version_id=plan.id, decision=body.decision, rationale=body.rationale.strip(), input_packet=packet,
                        next_obligation_id=next_obligation.id if next_obligation else None)
-    if body.decision in ("continue_unchanged", "revise"):
+    if body.decision in ("continue_unchanged", "revise") or (body.decision == "more_information" and next_obligation is not None):
         obligation.state = "fulfilled"
     _note(ctx, obligation, f"decision:{body.decision}", body.rationale.strip(), encounter_id=str(encounter.id))
     # The plan id is retained for an unchanged continuation; a revision goes through plan approval (U8).

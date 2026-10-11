@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Casebook · Evidence to care</title>
+<link rel="stylesheet" href="workflow.css">
+<script defer src="pdf-evidence.js"></script><script defer src="pdf-reader.js"></script><script defer src="workflow-model.js"></script><script defer src="pdf-workspace.js"></script><script defer src="workflow-app.js"></script>
+</head>
+<body>
+<a class="skip" href="#workspace">Skip to workspace</a>
+<div class="demo-bar"><strong>INTERACTIVE DEMO</strong><span>Fictional patients and simulated signatures. Uploaded research requires source review; no real clinical authorization.</span></div>
+<header class="topbar"><a class="brand" href="patient-evidence-review.html"><span class="brand-icon">c.</span>casebook<span class="brand-sub">Patient application demo</span></a><div class="switches"><label>Patient<select id="patient"><option value="meera">Meera · 42</option><option value="arun">Arun · 74</option></select></label><label>View as<select id="role"><option value="oncologist">Oncologist</option><option value="coordinator">Coordinator</option><option value="careteam">Receiving care team</option><option value="family">Patient & family</option></select></label></div></header>
+<div class="shell"><aside><div class="sidebar-label">PATIENT WORKSPACE</div><nav id="navigation" aria-label="Workspace"></nav><div class="side-note"><a href="aml-screen-walkthrough.html">← Patient clinical workspace</a><strong>A traceable decision</strong><p>Attach evidence. Make the differences visible. Record the decision and its handoff.</p><a href="aml-journey-storyboard.html">Earlier journey storyboard ↗</a><a href="evidence-to-protocol-blueprint.md">Product specification ↗</a></div><button class="link-button" id="reset">Reset this patient’s demo</button><p class="small">Demo progress is stored in this browser where available. Do not enter real patient details.</p></aside><main id="workspace" tabindex="-1"><div id="patient-header"></div><div id="progress" class="progress" aria-label="Workflow progress"></div><div id="notice" role="status" aria-live="polite"></div><div id="screen"></div></main></div>
+<dialog id="reset-dialog"><h2>Reset this patient?</h2><p>This removes only their locally saved demo progress. The other patient is unchanged.</p><div class="actions"><button class="secondary" id="cancel-reset">Keep progress</button><button class="primary" id="confirm-reset">Reset demo</button></div></dialog>
+<dialog id="pdf-source-dialog" class="pdf-dialog"><div class="card-top"><div><h2 id="pdf-source-title">Source page</h2><p class="small" id="pdf-source-meta"></p></div><button class="secondary" id="pdf-source-close">Close</button></div><div id="pdf-source-body"></div></dialog>
+<footer>Prototype · Not an EMR, recommendation engine or prescribing system. Role switching demonstrates responsibilities, not secure authentication. PDFs are processed in this browser; no files or messages are sent to an external service.</footer>
+</body></html>
