@@ -1,0 +1,21 @@
+{
+  "input": "meera-marrow-addendum",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0001",
+  "assertions": [
+    {
+      "analyte": "Morphology",
+      "value_text": "No increase in reticulin fibrosis on the trephine section",
+      "result_state": "reported_value",
+      "specimen_label": "Part B",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {
+    "relation_kind": "additive_addendum",
+    "supersedes": []
+  },
+  "note": null
+}

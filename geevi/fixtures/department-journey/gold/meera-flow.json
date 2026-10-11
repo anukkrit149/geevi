@@ -1,0 +1,34 @@
+{
+  "input": "meera-flow",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0001",
+  "assertions": [
+    {
+      "analyte": "Blast immunophenotype",
+      "value_text": "CD34 positive, CD117 positive, HLA-DR positive",
+      "result_state": "detected",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Myeloid markers",
+      "value_text": "CD13 and CD33 expressed; MPO not tested",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Lymphoid markers",
+      "value_text": "Not detected on the blast population",
+      "result_state": "not_detected",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": "The layout rule reads 'MPO not tested' as untested for the whole line; the reviewer must correct it. Gold records the intended reading."
+}

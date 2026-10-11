@@ -1,0 +1,42 @@
+{
+  "input": "arun-referral",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0002",
+  "assertions": [
+    {
+      "analyte": "Reason for referral",
+      "value_text": "Low blood counts with blasts reported on a routine check",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Prior treatment",
+      "value_text": "None reported",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Comorbidities",
+      "value_text": "Long-standing hypertension as stated by the referrer",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Home support",
+      "value_text": "Lives alone; daughter can attend by arrangement",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": null
+}

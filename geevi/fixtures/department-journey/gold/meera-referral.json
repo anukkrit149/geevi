@@ -1,0 +1,50 @@
+{
+  "input": "meera-referral",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0001",
+  "assertions": [
+    {
+      "analyte": "Reason for referral",
+      "value_text": "Abnormal blood count with circulating blasts reported by the referring clinic",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Presenting symptoms",
+      "value_text": "Fatigue and easy bruising for about three weeks",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Prior treatment",
+      "value_text": "None reported",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Performance status",
+      "value_text": "Not recorded in this referral",
+      "result_state": "unreported",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Home support",
+      "value_text": "Lives with spouse; sister available to accompany visits",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": null
+}

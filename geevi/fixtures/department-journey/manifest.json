@@ -1,0 +1,347 @@
+{
+  "schema": "geevi-fixture-manifest/1",
+  "label": "fictional",
+  "time_anchor": "Day 0 = referral received. Relative days illustrate workflow only, not recommended clinical timing.",
+  "patients": {
+    "meera": {
+      "display_name": "Meera (fictional)",
+      "identifiers": [
+        {
+          "system": "geevi-demo-mrn",
+          "value": "GEEVI-DEMO-0001"
+        }
+      ],
+      "summary": "Fictional adult referred with a new AML presentation.",
+      "episode_title": "New AML presentation (fictional)"
+    },
+    "arun": {
+      "display_name": "Arun (fictional)",
+      "identifiers": [
+        {
+          "system": "geevi-demo-mrn",
+          "value": "GEEVI-DEMO-0002"
+        }
+      ],
+      "summary": "Fictional older adult referred with a new AML presentation.",
+      "episode_title": "New AML presentation (fictional)"
+    }
+  },
+  "inputs": [
+    {
+      "id": "meera-referral",
+      "file": "inputs/meera-referral.pdf",
+      "media_type": "application/pdf",
+      "sha256": "3640972d072de7fa01a6afd47fdb3fdb6715dfbdfa71fe8034059e17241dfd7d",
+      "length": 2352,
+      "patient": "meera",
+      "doc_kind": "referral",
+      "title": "Referral letter",
+      "issuer": "Fictional Lakeside Clinic",
+      "accession": "REF-0101",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 0,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-blood-day-minus-1",
+      "file": "inputs/meera-blood-day-minus-1.pdf",
+      "media_type": "application/pdf",
+      "sha256": "2181663172be1cced81576cea550ce92a1b43fff7016b04677e28c89473d8242",
+      "length": 2350,
+      "patient": "meera",
+      "doc_kind": "blood_panel",
+      "title": "Blood count panel",
+      "issuer": "Fictional Northside Laboratory",
+      "accession": "HEM-2201",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 0,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-marrow",
+      "file": "inputs/meera-marrow.pdf",
+      "media_type": "application/pdf",
+      "sha256": "64025dd1da32c06b84861ce606d167957452cc5d995d6a23b0e747b40334aced",
+      "length": 2461,
+      "patient": "meera",
+      "doc_kind": "marrow",
+      "title": "Bone marrow morphology report",
+      "issuer": "Fictional Northside Pathology",
+      "accession": "MAR-3301",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 2,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-flow",
+      "file": "inputs/meera-flow.pdf",
+      "media_type": "application/pdf",
+      "sha256": "009497dbfa7cd2291e528d89d2ec9c73495f9d3d818d646cd7bf0fecdee68095",
+      "length": 2325,
+      "patient": "meera",
+      "doc_kind": "flow",
+      "title": "Flow cytometry report",
+      "issuer": "Fictional Northside Pathology",
+      "accession": "FLO-3302",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 2,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-cyto",
+      "file": "inputs/meera-cyto.pdf",
+      "media_type": "application/pdf",
+      "sha256": "0d773cf8fbbc2c553b4ad048e33b3a49b5e5138af7c6b0e2e775101aa42daf8d",
+      "length": 2241,
+      "patient": "meera",
+      "doc_kind": "cytogenetics",
+      "title": "Cytogenetics report",
+      "issuer": "Fictional Northside Pathology",
+      "accession": "CYT-3303",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 5,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-molecular-preliminary",
+      "file": "inputs/meera-molecular-preliminary.pdf",
+      "media_type": "application/pdf",
+      "sha256": "23a8180d1bccb7407e91f8e005886575728d123a469509f88ce15dff8eedb0b7",
+      "length": 2344,
+      "patient": "meera",
+      "doc_kind": "molecular",
+      "title": "Molecular panel - preliminary report",
+      "issuer": "Fictional Eastbank Genetics",
+      "accession": "MOL-7781",
+      "stage": "late",
+      "label": "fictional",
+      "received_time": {
+        "value": 7,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-marrow-addendum",
+      "file": "inputs/meera-marrow-addendum.pdf",
+      "media_type": "application/pdf",
+      "sha256": "1ca750db6cddb3c852de5525605706a463fefebafd7c8fd75f3f7239dd60dc6c",
+      "length": 2210,
+      "patient": "meera",
+      "doc_kind": "marrow",
+      "title": "Bone marrow report - addendum",
+      "issuer": "Fictional Northside Pathology",
+      "accession": "MAR-3301",
+      "stage": "addendum",
+      "label": "fictional",
+      "received_time": {
+        "value": 6,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-marrow-correction",
+      "file": "inputs/meera-marrow-correction.pdf",
+      "media_type": "application/pdf",
+      "sha256": "c782be1bdd41fb10de1710a22eb65719b07e96406f8de9eb6a9fdaf23b08ec07",
+      "length": 2177,
+      "patient": "meera",
+      "doc_kind": "marrow",
+      "title": "Bone marrow report - corrected",
+      "issuer": "Fictional Northside Pathology",
+      "accession": "MAR-3301",
+      "stage": "correction",
+      "label": "fictional",
+      "received_time": {
+        "value": 9,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "meera-blood-day-6",
+      "file": "inputs/meera-blood-day-6.pdf",
+      "media_type": "application/pdf",
+      "sha256": "bd283ae2646fa0ca1c302c7b5cbcd071197bfdfdfbd3ab572d0e9a6ff92de1be",
+      "length": 2306,
+      "patient": "meera",
+      "doc_kind": "blood_panel",
+      "title": "Blood count panel",
+      "issuer": "Fictional Northside Laboratory",
+      "accession": "HEM-2290",
+      "stage": "followup",
+      "label": "fictional",
+      "received_time": {
+        "value": 6,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "arun-referral",
+      "file": "inputs/arun-referral.pdf",
+      "media_type": "application/pdf",
+      "sha256": "80aaac78b91c4a2db00ac374a271c70b0c09ee5d8fe4115c5abfe5afbd5af165",
+      "length": 2288,
+      "patient": "arun",
+      "doc_kind": "referral",
+      "title": "Referral letter",
+      "issuer": "Fictional Lakeside Clinic",
+      "accession": "REF-0102",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 0,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "arun-blood-day-2",
+      "file": "inputs/arun-blood-day-2.pdf",
+      "media_type": "application/pdf",
+      "sha256": "7053e614fd0f499df7c3021f7064a5c2b5c0a41f11c6a7067b424eedeb465597",
+      "length": 2229,
+      "patient": "arun",
+      "doc_kind": "blood_panel",
+      "title": "Blood count panel",
+      "issuer": "Fictional Northside Laboratory",
+      "accession": "HEM-2207",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 2,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "arun-marrow",
+      "file": "inputs/arun-marrow.pdf",
+      "media_type": "application/pdf",
+      "sha256": "5504b3c25137b3641a156f24ebc6216ead29d6a0554c66e0df17a14a4eb4af02",
+      "length": 2222,
+      "patient": "arun",
+      "doc_kind": "marrow",
+      "title": "Bone marrow morphology report",
+      "issuer": "Fictional Northside Pathology",
+      "accession": "MAR-3310",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 3,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "arun-cyto",
+      "file": "inputs/arun-cyto.pdf",
+      "media_type": "application/pdf",
+      "sha256": "f69f17cab3b127e4621972285bbc74d80c85358cf380a22ee16ad3b8313cdf0f",
+      "length": 2135,
+      "patient": "arun",
+      "doc_kind": "cytogenetics",
+      "title": "Cytogenetics report",
+      "issuer": "Fictional Eastbank Genetics",
+      "accession": "CYT-3303",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 6,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    },
+    {
+      "id": "arun-echo-scan",
+      "file": "inputs/arun-echo-scan.png",
+      "media_type": "image/png",
+      "sha256": "9a3d21cbd00a00a2383888c55052a0a850df300c0c4bacf9707e2de4cd091077",
+      "length": 7381,
+      "patient": "arun",
+      "doc_kind": "organ_assessment",
+      "title": "External echocardiogram (scanned image)",
+      "issuer": "Fictional Riverside Cardiology",
+      "accession": "ECH-5510",
+      "stage": "baseline",
+      "label": "fictional",
+      "received_time": {
+        "value": 4,
+        "unit": "day",
+        "anchor": "episode-day-0",
+        "precision": "day",
+        "basis": "fictional relative demonstration day"
+      }
+    }
+  ],
+  "research": [
+    {
+      "id": "research-preparation-audit",
+      "file": "inputs/research-preparation-audit.pdf",
+      "media_type": "application/pdf",
+      "sha256": "a93393594b8e805ec54c03e0a287fe78160e3d2f2aca75d11a5507b22facbfc4",
+      "length": 2204,
+      "citation": "Fictional Department Audit Group. Completeness of new-case preparation before the first planning visit. Synthetic teaching note, 2026.",
+      "title": "Synthetic audit note: new-case preparation completeness",
+      "label": "synthetic"
+    },
+    {
+      "id": "research-caregiver-contact",
+      "file": "inputs/research-caregiver-contact.pdf",
+      "media_type": "application/pdf",
+      "sha256": "97dba09595ac4938bbb55482a4925fad09f0043d0dda7d7acb16ea9c00f261b9",
+      "length": 1892,
+      "citation": "Fictional Department Audit Group. Caregiver contact confirmation and handoff delays. Synthetic teaching note, 2026.",
+      "title": "Synthetic audit note: caregiver contact confirmation",
+      "label": "synthetic"
+    }
+  ]
+}

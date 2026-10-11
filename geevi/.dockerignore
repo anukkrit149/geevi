@@ -1,0 +1,12 @@
+**/node_modules
+**/.next
+**/.next-e2e
+**/.venv
+**/__pycache__
+.pgdata
+.geevi-local
+**/.env
+**/.dev-credentials.json
+**/.e2e-credentials.json
+**/test-results
+**/playwright-report

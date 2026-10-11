@@ -1,0 +1,88 @@
+# CI for the Geevi full-stack demonstration. Uses only committed lockfiles, migrations and the
+# generated API contract. This workflow assumes this folder is the repository root; if it lives
+# inside a larger repository, move this file to that repository's .github/workflows/ and set
+# `defaults.run.working-directory` to this folder.
+name: oncology-app-ci
+
+on:
+  push:
+  pull_request:
+
+env:
+  GEEVI_TEST_ADMIN_URL: postgresql+psycopg://geevi:geevi@127.0.0.1:5432/postgres
+  PGHOST: 127.0.0.1
+  PGUSER: geevi
+  PGPASSWORD: geevi
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env: { POSTGRES_USER: geevi, POSTGRES_PASSWORD: geevi, POSTGRES_DB: geevi }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U geevi" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.6.13" }
+      - run: uv sync --project apps/api --frozen
+      - run: cd apps/api && uv run ruff check app tests scripts
+      - name: Migrations apply from an empty database and step back and forward
+        run: |
+          createdb geevi_migrations
+          cd apps/api
+          export GEEVI_DATABASE_URL=postgresql+psycopg://geevi:geevi@127.0.0.1:5432/geevi_migrations
+          uv run alembic upgrade head && uv run alembic downgrade 0005 && uv run alembic upgrade head
+      - name: Backend domain, HTTP and PostgreSQL integration tests
+        run: cd apps/api && uv run pytest tests
+
+  contracts-and-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.6.13" }
+      - run: pnpm install --frozen-lockfile
+      - run: uv sync --project apps/api --frozen
+      - name: Generated OpenAPI artifact and TypeScript types are current
+        run: pnpm contracts:check
+      - name: Fixture pack is reproducible
+        run: cd apps/api && uv run python scripts/make_fixtures.py && git diff --exit-code -- ../../fixtures
+      - run: pnpm --dir apps/web lint
+      - run: pnpm --dir apps/web typecheck
+      - run: pnpm --dir apps/web test
+      - run: pnpm --dir apps/web build
+
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env: { POSTGRES_USER: geevi, POSTGRES_PASSWORD: geevi, POSTGRES_DB: geevi }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U geevi" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.6.13" }
+      - run: pnpm install --frozen-lockfile
+      - run: uv sync --project apps/api --frozen
+      - run: pnpm --dir apps/web exec playwright install --with-deps chromium
+      - run: createdb geevi_e2e
+      - name: Browser journeys against the real API, sessions and PostgreSQL
+        run: pnpm --dir apps/web e2e
+        env:
+          GEEVI_E2E_DATABASE_URL: postgresql+psycopg://geevi:geevi@127.0.0.1:5432/geevi_e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: { name: playwright-report, path: apps/web/playwright-report }

@@ -1,0 +1,26 @@
+{
+  "input": "arun-marrow",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0002",
+  "assertions": [
+    {
+      "analyte": "Blast percentage",
+      "value_text": "34 % of nucleated cells",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Reported diagnosis",
+      "value_text": "Acute myeloid leukaemia",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": null
+}

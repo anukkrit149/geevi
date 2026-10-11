@@ -1,0 +1,20 @@
+{
+  "name": "geevi",
+  "private": true,
+  "description": "Geevi oncology department journey (fictional full-stack demonstration; not clinically validated)",
+  "packageManager": "pnpm@10.33.4",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "db:start": "./scripts/dev-db.sh start",
+    "db:stop": "./scripts/dev-db.sh stop",
+    "api:migrate": "cd apps/api && uv run alembic upgrade head",
+    "api:seed": "cd apps/api && GEEVI_DEV_MODE=true uv run python scripts/seed_demo.py",
+    "api:dev": "cd apps/api && GEEVI_DEV_MODE=true uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload",
+    "api:test": "cd apps/api && uv run pytest tests",
+    "api:lint": "cd apps/api && uv run ruff check app tests scripts",
+    "web:dev": "pnpm --dir apps/web dev",
+    "contracts:generate": "node scripts/contracts.mjs generate",
+    "contracts:check": "node scripts/contracts.mjs check",
+    "fixtures:make": "cd apps/api && uv run python scripts/make_fixtures.py"
+  }
+}

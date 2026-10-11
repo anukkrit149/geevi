@@ -1,0 +1,27 @@
+{
+  "input": "meera-marrow-correction",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0001",
+  "assertions": [
+    {
+      "analyte": "Cellularity",
+      "value_text": "80 %",
+      "result_state": "reported_value",
+      "specimen_label": "Part B",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {
+    "relation_kind": "correction",
+    "supersedes": [
+      {
+        "analyte": "Cellularity",
+        "specimen_label": "Part B",
+        "previous_value": "90 %"
+      }
+    ]
+  },
+  "note": null
+}

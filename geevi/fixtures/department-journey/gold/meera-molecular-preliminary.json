@@ -1,0 +1,42 @@
+{
+  "input": "meera-molecular-preliminary",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0001",
+  "assertions": [
+    {
+      "analyte": "NPM1",
+      "value_text": "Pending - analysis in progress",
+      "result_state": "pending",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "FLT3-ITD",
+      "value_text": "Not detected",
+      "result_state": "not_detected",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "TP53",
+      "value_text": "Not tested on this panel",
+      "result_state": "untested",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "IDH1",
+      "value_text": "Indeterminate - low coverage",
+      "result_state": "indeterminate",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": "Arrives after the first profile snapshot although it describes Day 1 material (late-arriving report)."
+}

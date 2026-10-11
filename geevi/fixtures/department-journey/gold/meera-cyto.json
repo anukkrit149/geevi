@@ -1,0 +1,34 @@
+{
+  "input": "meera-cyto",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0001",
+  "assertions": [
+    {
+      "analyte": "Karyotype",
+      "value_text": "46,XX[20]",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Metaphases analysed",
+      "value_text": "20",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "FISH panel",
+      "value_text": "Not performed - insufficient sample",
+      "result_state": "insufficient_sample",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": null
+}

@@ -1,0 +1,28 @@
+{
+  "input": "arun-blood-day-2",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0002",
+  "assertions": [
+    {
+      "analyte": "Hemoglobin",
+      "value_text": "9.1",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": "g/dL",
+      "reference_range": "13.0-17.0"
+    },
+    {
+      "analyte": "Platelets",
+      "value_text": "58",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": "x10^9/L",
+      "reference_range": "150-400"
+    }
+  ],
+  "expected": {
+    "wrong_patient_if_uploaded_to": "meera"
+  },
+  "note": null
+}

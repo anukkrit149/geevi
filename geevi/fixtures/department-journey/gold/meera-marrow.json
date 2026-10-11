@@ -1,0 +1,42 @@
+{
+  "input": "meera-marrow",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0001",
+  "assertions": [
+    {
+      "analyte": "Blast percentage",
+      "value_text": "62 % of nucleated cells (500-cell differential)",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Morphology",
+      "value_text": "Blasts with fine chromatin; granules seen in occasional cells",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Cellularity",
+      "value_text": "90 %",
+      "result_state": "reported_value",
+      "specimen_label": "Part B",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Reported diagnosis",
+      "value_text": "Acute myeloid leukaemia; cytogenetic and molecular classification to follow",
+      "result_state": "pending",
+      "specimen_label": "Part B",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": null
+}

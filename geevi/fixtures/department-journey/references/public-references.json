@@ -1,0 +1,25 @@
+{
+  "label": "public_reference",
+  "references": [
+    {
+      "title": "HL7 mCODE implementation guide",
+      "url": "https://hl7.org/fhir/us/mcode/",
+      "use": "Representation boundary only; no conformance claim."
+    },
+    {
+      "title": "HL7 FHIR R4 DiagnosticReport",
+      "url": "https://hl7.org/fhir/R4/diagnosticreport.html",
+      "use": "Report/observation separation; no conformance claim."
+    },
+    {
+      "title": "Beat AML 2.0 public workbook (see research_oncology_datasets/dataset-guide.md)",
+      "url": null,
+      "use": "Informs patient/specimen/assay/missingness structure only. No subject is imported or joined to Meera or Arun."
+    },
+    {
+      "title": "GDC pathology report sample (lung; see research_oncology_datasets/samples/README.md)",
+      "url": null,
+      "use": "Informs report sections and multi-specimen handling only. Not an AML reference; not imported."
+    }
+  ]
+}

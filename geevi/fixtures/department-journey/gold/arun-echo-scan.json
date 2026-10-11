@@ -1,0 +1,21 @@
+{
+  "input": "arun-echo-scan",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0002",
+  "assertions": [
+    {
+      "analyte": "LVEF",
+      "value_text": "55 % (as printed on the scanned page)",
+      "result_state": "reported_value",
+      "specimen_label": null,
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {
+    "candidates": 0,
+    "manual_entry_required": true
+  },
+  "note": "Image-only original: no machine findings are extracted; a reviewer transcribes with a marked region."
+}

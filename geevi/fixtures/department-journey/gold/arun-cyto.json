@@ -1,0 +1,18 @@
+{
+  "input": "arun-cyto",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0002",
+  "assertions": [
+    {
+      "analyte": "Karyotype",
+      "value_text": "46,XY[20]",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": "Deliberately the same accession number as Meera's cytogenetics from a different issuer: identities must stay distinct."
+}
