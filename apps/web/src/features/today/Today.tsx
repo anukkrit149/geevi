@@ -18,7 +18,7 @@ export function hrefFor(ws: string, entry: Pick<Entry, "kind" | "patient_id" | "
     case "research_question": return `${base}/research/${entry.target_id}`;
     case "impact_review": return `${base}/impacts`;
     case "source_document": return entry.patient_id ? `${base}/patients/${entry.patient_id}/sources/${entry.target_id}` : `${base}/patients`;
-    case "expected_input": return `${base}/patients/${entry.patient_id}`;
+    case "expected_input": return `${base}/patients/${entry.patient_id}/sources`;
     case "exception_request":
     case "patient_plan_version": return `${base}/patients/${entry.patient_id}/decisions`;
     case "task":
@@ -49,6 +49,7 @@ export function Today({ workspaceId }: { workspaceId: string }) {
         </div>
       </div>
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
+      {can("clinical.read") ? <details className="card" data-testid="demo-orientation"><summary>Walk through the oncology department workflow</summary><p>Start with a <Link href={`/w/${workspaceId}/patients`}>patient</Link>: understand disease findings, treatment received, recorded response and the current decision. Use <Link href={`/w/${workspaceId}/research`}>Research</Link> to examine evidence, its limits and applicability before proposing a <Link href={`/w/${workspaceId}/department`}>shared protocol</Link>.</p><p className="small">Demo roles: Rao authors research and patient plans; Sen reviews independently; Mira verifies reports and coordinates follow-up; Isha accepts handoffs and records care. These development accounts simulate the role split; approvals are not institutional signatures.</p></details> : null}
       {today.isLoading ? <Loading what="your work" /> : null}
       {today.data && !today.data.items.length ? <Card title="Nothing is waiting on you"><Empty>No owned work for this account right now.</Empty></Card> : null}
       <div data-testid="worklist">

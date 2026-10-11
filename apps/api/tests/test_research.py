@@ -2,13 +2,47 @@
 from tests.helpers import W, accept_appraisal, accepted_evidence, b64, decide, draft_appraisal, raw, register
 
 
+def test_reference_pack_preserves_provenance_and_import_is_permissioned_and_idempotent(api, workspace):
+    import uuid
+
+    path = f"{W(workspace)}/research/reference-pack"
+    refs = api("sen").get(path)
+    assert {r["id"] for r in refs} == {"eln-aml-2022", "viale-a-2020", "beat-aml-2018"}
+    assert all(r["access_status"] and r["limitations"] for r in refs)
+    api("operator").get(path, expect=403)
+    api("sen").fail(path + "/viale-a-2020/import", status=403)
+    command = str(uuid.uuid4())
+    result = api("rao").post(path + "/viale-a-2020/import", command_id=command)
+    repeated = api("rao").post(path + "/viale-a-2020/import", command_id=command)
+    assert result["target"] == repeated["target"]
+    sources = api("sen").get(f"{W(workspace)}/research/sources")
+    assert len(sources) == 1 and sources[0]["source_label"] == "public_reference"
+    source = api("sen").get(f"{W(workspace)}/research/sources/{sources[0]['id']}")
+    finding = next(p for p in source["passages"] if p["text"].startswith("Finding 1:"))
+    assert "14.7 versus 9.6" in finding["text"] and "42% versus 19%" in finding["text"]
+    assert source["citation"] == next(r["citation"] for r in refs if r["id"] == "viale-a-2020")
+    content = api("sen").http.get(f"/api/v1{W(workspace)}/research/sources/{source['id']}/content")
+    assert content.content == raw("viale-a-2020") and "no-store" in content.headers["cache-control"]
+    api("rao").fail(path + "/missing-reference/import", status=404)
+
+
+def test_case_link_must_reference_a_patient_in_the_same_workspace(api, workspace):
+    from tests.helpers import SCENARIO
+
+    meera = register(api, workspace, "meera")
+    body = SCENARIO["research"]["question_v1"]
+    api("rao").fail(f"{W(workspace)}/research/questions", {**body, "origin": {"patient_id": "not-a-uuid"}}, code="invalid_case_origin")
+    other = api("operator").post("/dev/workspaces", {"name": "Other fictional workspace", "load": "none"})["workspace_id"]
+    api("rao").fail(f"{W(other)}/research/questions", {**body, "origin": {"patient_id": meera}}, status=404)
+
+
 def test_sen_accepts_cited_appraisal_without_publishing_or_approving_anything(api, workspace):
     register(api, workspace, "meera")
     question, source, appraisal = draft_appraisal(api, workspace)
     accept_appraisal(api, workspace, appraisal)
     detail = api("rao").get(f"{W(workspace)}/research/questions/{question}")
     accepted = detail["appraisals"][0]
-    assert accepted["status"] == "accepted" and accepted["citations"][0]["source_id"] == source and accepted["content"]["study_design"].startswith("Retrospective")
+    assert accepted["status"] == "accepted" and accepted["citations"][0]["source_id"] == source and accepted["content"]["study_design"] == "Expert-panel recommendations"
     decision = detail["reviews"][0]["decisions"][0]
     assert decision["decision"] == "approve" and decision["recorded_by_name"] == "Dr. Sen" and decision["target_digest"] == accepted["content_digest"]
     assert detail["reviews"][0]["packet"]["policy"]["rule"]["independent_of_author"] is True
@@ -17,7 +51,7 @@ def test_sen_accepts_cited_appraisal_without_publishing_or_approving_anything(ap
     assert "no patient recommendation" in detail["recommendation_notice"]
     # The evidence file and its cited passage reload through the same API/database.
     content = api("sen").http.get(f"/api/v1{W(workspace)}/research/sources/{source}/content")
-    assert content.status_code == 200 and content.content == raw("research-preparation-audit")
+    assert content.status_code == 200 and content.content == raw("eln-aml-2022")
     passage = next(p for s in api("sen").get(f"{W(workspace)}/research/sources") if s["id"] == source for p in s["passages"]
                    if p["id"] == accepted["citations"][0]["passage_id"])
     assert passage["text"].startswith("Finding 1") and len(passage["region"]) == 4
@@ -49,7 +83,7 @@ def test_objection_blocks_acceptance_until_successor_and_history_is_kept(api, wo
     successor = api("rao").post(f"{W(workspace)}/research/appraisals/{appraisal}/revise")["target"]["id"]
     current = next(a for a in api("rao").get(f"{W(workspace)}/research/appraisals") if a["id"] == successor)
     api("rao").post(f"{W(workspace)}/research/appraisals/{successor}/save", {
-        "expected_revision": 1, **current["content"], "limitations": "No comparison group; invented single-site data; direction of association unknown.",
+        "expected_revision": 1, **current["content"], "limitations": "Expert recommendations, not a comparative study; the full guideline tables were not appraised. Current evidence and local applicability require further review.",
         "citations": current["citations"]})
     second = api("rao").post(f"{W(workspace)}/research/appraisals/{successor}/submit", {"expected_revision": 2, "reviewer_username": "sen"})["data"]["packet_id"]
     decide(api, workspace, "sen", second, "approve", "Limitations now stated plainly.")
@@ -72,7 +106,7 @@ def test_source_amendment_or_withdrawal_creates_dependent_review_work(api, works
     _, source, appraisal = accepted_evidence(api, workspace)
     amended = api("rao").post(f"{W(workspace)}/research/sources/{source}/amend", {
         "expected_revision": 1, "reason": "Authors issued a corrected version of the note.", "media_type": "application/pdf",
-        "content_base64": b64(raw("research-caregiver-contact"))})
+        "content_base64": b64(raw("viale-a-2020"))})
     assert amended["data"]["dependants_flagged"] == 1
     row = next(a for a in api("rao").get(f"{W(workspace)}/research/appraisals") if a["id"] == appraisal)
     assert row["status"] == "accepted" and row["review_needed"] is True and "amended" in row["review_needed_reason"]
@@ -96,7 +130,7 @@ def test_insufficient_evidence_conclusion_produces_no_recommendation(api, worksp
     api("rao").fail(f"{W(workspace)}/research/questions/{q}/conclude", {"expected_revision": 1, "conclusion": "evidence_accepted", "note": "Looks fine to me"}, code="no_accepted_evidence")
     api("sen").fail(f"{W(workspace)}/research/questions/{q}/conclude", {"expected_revision": 1, "conclusion": "insufficient_evidence", "note": "Not my question"}, code="actor_not_permitted")
     api("rao").post(f"{W(workspace)}/research/questions/{q}/conclude", {"expected_revision": 1, "conclusion": "insufficient_evidence",
-                                                                      "note": "No local or imported evidence addresses weekend scheduling."})
+                                                                      "note": "The reviewed research assay evidence does not establish clinical benefit for this individual."})
     question = api("rao").get(f"{W(workspace)}/research/questions/{q}")["question"]
     assert question["status"] == "concluded" and question["conclusion"] == "insufficient_evidence" and question["origin"]["patient_id"] == meera
     assert api("rao").get(f"{W(workspace)}/protocols") == []

@@ -6828,6 +6828,11 @@
           "currency": {
             "$ref": "#/components/schemas/Currency"
           },
+          "decision_context": {
+            "additionalProperties": true,
+            "title": "Decision Context",
+            "type": "object"
+          },
           "disposition": {
             "anyOf": [
               {
@@ -6888,7 +6893,8 @@
           "dispositions",
           "currency",
           "gates",
-          "packet_changes"
+          "packet_changes",
+          "decision_context"
         ],
         "title": "PlanView",
         "type": "object"
@@ -8094,6 +8100,102 @@
           "recorded_at"
         ],
         "title": "RecoverySnapshotOut",
+        "type": "object"
+      },
+      "ReferenceBrief": {
+        "properties": {
+          "access_status": {
+            "title": "Access Status",
+            "type": "string"
+          },
+          "applicability": {
+            "title": "Applicability",
+            "type": "string"
+          },
+          "citation": {
+            "title": "Citation",
+            "type": "string"
+          },
+          "comparator": {
+            "title": "Comparator",
+            "type": "string"
+          },
+          "findings": {
+            "title": "Findings",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "intervention": {
+            "title": "Intervention",
+            "type": "string"
+          },
+          "license_note": {
+            "title": "License Note",
+            "type": "string"
+          },
+          "limitations": {
+            "title": "Limitations",
+            "type": "string"
+          },
+          "outcomes": {
+            "title": "Outcomes",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "string"
+          },
+          "publication_date": {
+            "title": "Publication Date",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "search_terms": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Search Terms",
+            "type": "array"
+          },
+          "source_type": {
+            "title": "Source Type",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "citation",
+          "url",
+          "publication_date",
+          "source_type",
+          "question",
+          "population",
+          "intervention",
+          "comparator",
+          "outcomes",
+          "findings",
+          "limitations",
+          "applicability",
+          "license_note",
+          "search_terms",
+          "access_status"
+        ],
+        "title": "ReferenceBrief",
         "type": "object"
       },
       "RejectDocument": {
@@ -22052,6 +22154,216 @@
         ]
       }
     },
+    "/api/v1/workspaces/{workspace_id}/research/reference-pack": {
+      "get": {
+        "description": "Attributed published-evidence briefs, separate from fictional patient documents.",
+        "operationId": "reference_pack_api_v1_workspaces__workspace_id__research_reference_pack_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReferenceBrief"
+                  },
+                  "title": "Response Reference Pack Api V1 Workspaces  Workspace Id  Research Reference Pack Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Reference Pack",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/research/reference-pack/{reference_id}/import": {
+      "post": {
+        "operationId": "import_reference_api_v1_workspaces__workspace_id__research_reference_pack__reference_id__import_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "reference_id",
+            "required": true,
+            "schema": {
+              "title": "Reference Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommandBase"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Import Reference",
+        "tags": [
+          "research"
+        ]
+      }
+    },
     "/api/v1/workspaces/{workspace_id}/research/sources": {
       "get": {
         "operationId": "list_sources_api_v1_workspaces__workspace_id__research_sources_get",
@@ -22245,6 +22557,109 @@
           }
         },
         "summary": "Add Source",
+        "tags": [
+          "research"
+        ]
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/research/sources/{source_id}": {
+      "get": {
+        "operationId": "get_source_api_v1_workspaces__workspace_id__research_sources__source_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "source_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Source Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "workspace_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Workspace Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceSourceOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "summary": "Get Source",
         "tags": [
           "research"
         ]

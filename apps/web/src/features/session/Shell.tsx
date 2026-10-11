@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Button, Loading } from "@/components/ui";
 import { useSession, useWorkspace } from "@/lib/session/session";
 
@@ -21,10 +21,11 @@ export function Shell({ workspaceId, children }: { workspaceId: string; children
   const { workspace, can } = useWorkspace(workspaceId);
   const pathname = usePathname();
   const router = useRouter();
+  const signingOut = useRef(false);
 
   useEffect(() => {
-    if (!loading && !session) router.replace("/login");
-  }, [loading, session, router]);
+    if (!loading && !session && !signingOut.current) router.replace(`/login?returnTo=${encodeURIComponent(pathname + window.location.search)}`);
+  }, [loading, session, router, pathname]);
 
   if (loading || !session) return <main id="main" className="login"><Loading what="session" /></main>;
   if (!workspace) {
@@ -58,13 +59,13 @@ export function Shell({ workspaceId, children }: { workspaceId: string; children
           <strong data-testid="identity-name">{session.account.display_name}</strong>
           <span>{session.account.role_title}</span>
           <div style={{ marginTop: ".5rem" }}>
-            <Button onClick={async () => { await signOut(); router.replace("/login"); }}>Sign out</Button>
+            <Button onClick={async () => { signingOut.current = true; await signOut(); router.replace("/login"); }}>Sign out</Button>
           </div>
         </div>
       </aside>
       <main id="main" className="main" tabIndex={-1}>
         <div className="banner" role="note">
-          Fictional demonstration data. Signatures are demonstration records by development identities, not institutional signatures. Clinical content is unvalidated.
+          Fictional demonstration data · Simulated approvals · Not for clinical use.
         </div>
         {children}
       </main>

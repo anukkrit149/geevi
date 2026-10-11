@@ -20,7 +20,7 @@ from tests.helpers import (
 def _two_patients(api, ws):
     s = meera_planned(api, ws)
     s.update(arun_planned(api, ws, s))
-    _, _, s["appraisal2"] = accepted_evidence(api, ws, "v2", "research-caregiver-contact")
+    _, _, s["appraisal2"] = accepted_evidence(api, ws, "v2", "viale-a-2020")
     return s
 
 
@@ -116,14 +116,14 @@ def test_new_research_question_changes_no_patient_decision(api, workspace):
     before = api("rao").get(f"{W(workspace)}/plans/{s['plan']}")
     origin = {"kind": "case_origin", "patient_id": s["meera"], "note": "Raised from this fictional case"}
     api("rao").post(f"{W(workspace)}/research/questions", {**SCENARIO["research"]["question_v2"], "origin": origin})
-    accepted_evidence(api, workspace, "v2", "research-caregiver-contact")  # even accepted new evidence changes nothing by itself
+    accepted_evidence(api, workspace, "v2", "viale-a-2020")  # even accepted new evidence changes nothing by itself
     assert api("rao").get(f"{W(workspace)}/plans/{s['plan']}") == before and open_impacts(api, workspace) == []
 
 
 def test_failed_publication_persists_neither_version_nor_partial_impacts(api, workspace, monkeypatch):
     """AE1/U11.6: publication and its impact set commit or fail together."""
     s = _two_patients(api, workspace)
-    v2 = api("rao").post(f"{W(workspace)}/protocols/{s['protocol']}/revise", {"rationale": "Add caregiver contact confirmation.", "evidence": [s["appraisal2"]]})["target"]["id"]
+    v2 = api("rao").post(f"{W(workspace)}/protocols/{s['protocol']}/revise", {"rationale": "Add individual-context review before trial interpretation.", "evidence": [s["appraisal2"]]})["target"]["id"]
     api("rao").post(f"{W(workspace)}/protocols/{v2}/save", {"expected_revision": 1, **protocol_body("v2", [s["appraisal"], s["appraisal2"]])})
     packet = api("rao").post(f"{W(workspace)}/protocols/{v2}/submit", {"expected_revision": 2, "reviewer_username": "sen"})["data"]["packet_id"]
     decide(api, workspace, "sen", packet)

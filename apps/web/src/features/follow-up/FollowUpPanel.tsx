@@ -9,8 +9,8 @@ import { day, relDay, when, words } from "@/lib/format";
 import { useWorkspace } from "@/lib/session/session";
 
 type Obligation = Schemas["FollowUpObligationOut"];
-type Form = { day: string; reason: string; decision: string; rationale: string; nextPurpose: string; nextDay: string; nextOwner: string; dueDay: string };
-const BLANK: Form = { day: "", reason: "", decision: "continue_unchanged", rationale: "", nextPurpose: "Next routine follow-up review", nextDay: "", nextOwner: "mira", dueDay: "" };
+type Form = { day: string; actualDay: string; reason: string; decision: string; rationale: string; nextPurpose: string; nextDay: string; nextOwner: string; dueDay: string; transferOwner: string };
+const BLANK: Form = { day: "", actualDay: "", reason: "", decision: "continue_unchanged", rationale: "", nextPurpose: "Next routine follow-up review", nextDay: "", nextOwner: "mira", dueDay: "", transferOwner: "mira" };
 
 export function FollowUpPanel({ workspaceId, patientId }: { workspaceId: string; patientId: string }) {
   const { can } = useWorkspace(workspaceId);
@@ -19,6 +19,7 @@ export function FollowUpPanel({ workspaceId, patientId }: { workspaceId: string;
   const members = useMembers(workspaceId);
   const action = useAction(workspaceId);
   const [forms, setForms] = useState<Record<string, Form>>({});
+  const [newObligation, setNewObligation] = useState({ purpose: "", day: "", owner: "mira" });
   const form = (o: Obligation) => forms[o.id] ?? BLANK;
   const set = (o: Obligation, patch: Partial<Form>) => setForms({ ...forms, [o.id]: { ...form(o), ...patch } });
   const op = (o: Obligation) => ({ params: { path: { ...ws, obligation_id: o.id } } });
@@ -54,11 +55,13 @@ export function FollowUpPanel({ workspaceId, patientId }: { workspaceId: string;
                   {o.authored ? <Button disabled={!f.dueDay} onClick={() => action.run(`due:${o.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/follow-ups/{obligation_id}/propose-due-change", {
                     ...op(o), body: { command_id, expected_revision: o.revision, due: relDay(Number(f.dueDay)) as never, reason: f.reason } }), "Clinical timing change sent for clinician review")}>Request clinical timing change</Button> : null}
                 </div>
+                <details><summary>Transfer responsibility or cancel</summary><Select label="Transfer follow-up to" value={f.transferOwner} onChange={(transferOwner) => set(o, { transferOwner })} options={(members.data ?? []).filter((m) => m.capabilities.includes("followup.manage")).map((m) => ({ value: m.username, label: m.display_name }))} /><div className="row"><Button disabled={f.reason.trim().length < 8} onClick={() => action.run(`transfer:${o.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/follow-ups/{obligation_id}/transfer", { ...op(o), body: { command_id, expected_revision: o.revision, owner_username: f.transferOwner, reason: f.reason } }), "Follow-up responsibility transferred")}>Transfer follow-up</Button><Button variant="danger" disabled={f.reason.trim().length < 8} onClick={() => action.run(`cancel:${o.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/follow-ups/{obligation_id}/cancel", { ...op(o), body: { command_id, expected_revision: o.revision, reason: f.reason } }), "Follow-up cancelled with a recorded reason")}>Cancel follow-up</Button></div><p className="small">Cancelling an authored obligation requires clinical review; its timing is not silently removed.</p></details>
               </fieldset>
             ) : null}
             {openState && can("followup.decide") ? (
               <fieldset data-testid="encounter-decision">
                 <legend>Encounter decision (treating clinician)</legend>
+                <TextInput label="Actual encounter (relative day, if known)" inputMode="numeric" value={f.actualDay} onChange={(actualDay) => set(o, { actualDay })} hint="Enter when the encounter actually occurred. The appointment date is never treated as proof of attendance." />
                 <Select label="Decision" value={f.decision} onChange={(decision) => set(o, { decision })}
                   options={[{ value: "continue_unchanged", label: "Continue the signed plan unchanged" }, { value: "revise", label: "Revise the plan (through plan approval)" },
                     { value: "more_information", label: "More information needed" }, { value: "unresolved", label: "Unresolved" }]} />
@@ -73,7 +76,7 @@ export function FollowUpPanel({ workspaceId, patientId }: { workspaceId: string;
                 <Button variant="primary" busy={action.pending === `decide:${o.id}`} onClick={async () => {
                   const done = await action.run(`decide:${o.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/follow-ups/{obligation_id}/decide", {
                     ...op(o), body: { command_id, expected_revision: o.revision, decision: f.decision as never, rationale: f.rationale,
-                      actual_time: o.scheduled_time as never ?? null,
+                      actual_time: f.actualDay.trim() ? relDay(Number(f.actualDay)) as never : null,
                       next: f.nextDay && ["continue_unchanged", "more_information"].includes(f.decision) ? { purpose: f.nextPurpose, due: relDay(Number(f.nextDay)) as never, owner_username: f.nextOwner } : null } }),
                     "Encounter decision recorded");
                   if (done) setForms({ ...forms, [o.id]: BLANK });
@@ -86,6 +89,7 @@ export function FollowUpPanel({ workspaceId, patientId }: { workspaceId: string;
           </div>
         );
       }) : <Empty>No follow-up obligation exists yet. One is created when a plan with an authored obligation is approved.</Empty>}
+      {can("followup.manage") ? <details><summary>Create an administrative follow-up</summary><form onSubmit={async (e) => { e.preventDefault(); const done = await action.run("create-followup", (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/patients/{patient_id}/follow-ups", { params: { path: { ...ws, patient_id: patientId } }, body: { command_id, purpose: newObligation.purpose, due: relDay(Number(newObligation.day)) as never, owner_username: newObligation.owner } }), "Administrative follow-up created"); if (done) setNewObligation({ ...newObligation, purpose: "", day: "" }); }}><TextInput label="Administrative follow-up purpose" value={newObligation.purpose} onChange={(purpose) => setNewObligation({ ...newObligation, purpose })} required minLength={5} /><TextInput label="Administrative follow-up due day" value={newObligation.day} onChange={(day) => setNewObligation({ ...newObligation, day })} required inputMode="numeric" /><Select label="Administrative follow-up owner" value={newObligation.owner} onChange={(owner) => setNewObligation({ ...newObligation, owner })} options={(members.data ?? []).filter((m) => m.capabilities.includes("followup.manage")).map((m) => ({ value: m.username, label: m.display_name }))} /><Button type="submit">Create follow-up</Button><p className="small">This creates an administrative duty; it does not modify a signed clinical plan.</p></form></details> : null}
     </Card>
   );
 }

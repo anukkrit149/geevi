@@ -10,7 +10,7 @@ test("separate source reports: receive, quarantine, associate, inspect the exact
 
   // Receive the marrow report through the upload form.
   await mira.getByLabel("Original file").setInputFiles(input("meera-marrow"));
-  await mira.getByLabel("Report type").selectOption("marrow");
+  await mira.getByLabel("Report type", { exact: true }).selectOption("marrow");
   await mira.getByRole("button", { name: "Receive document" }).click();
   await expect(mira.getByTestId("upload-result")).toContainText("pending — 4 candidate finding(s)");
 
@@ -21,7 +21,7 @@ test("separate source reports: receive, quarantine, associate, inspect the exact
 
   // A report naming another patient's identifier is quarantined, never attached.
   await mira.getByLabel("Original file").setInputFiles(input("arun-blood-day-2"));
-  await mira.getByLabel("Report type").selectOption("blood_panel");
+  await mira.getByLabel("Report type", { exact: true }).selectOption("blood_panel");
   await mira.getByRole("button", { name: "Receive document" }).click();
   await expect(mira.getByTestId("upload-result")).toContainText("quarantined");
   await mira.getByRole("link", { name: "Blood count panel" }).click();

@@ -8,6 +8,17 @@ def _obligation(api, ws, pid, index=0):
     return api("rao").get(f"{W(ws)}/follow-ups?patient_id={pid}")[index]
 
 
+def test_information_review_with_an_explicit_next_duty_replaces_the_completed_review_obligation(api, workspace):
+    s = meera_planned(api, workspace)
+    old = _obligation(api, workspace, s["meera"])
+    api("rao").post(f"{W(workspace)}/follow-ups/{old['id']}/decide", {
+        "expected_revision": old["revision"], "decision": "more_information", "actual_time": DAY(14),
+        "rationale": "The review occurred; additional information is needed for the next decision.", "next": NEXT})
+    rows = api("rao").get(f"{W(workspace)}/follow-ups?patient_id={s['meera']}")
+    assert [(r["state"], r["due"]["value"]) for r in rows] == [("fulfilled", 14), ("open", 28)]
+    assert rows[1]["previous_obligation_id"] == old["id"] and rows[1]["owner_name"] == "Mira"
+
+
 def test_acknowledged_concern_without_response_stays_open_and_owned(api, workspace):
     s = meera_planned(api, workspace)
     concern = api("mira").post(f"{W(workspace)}/patients/{s['meera']}/concerns", {
@@ -117,3 +128,13 @@ def test_clinical_schedule_change_uses_scoped_review_but_administrative_edit_doe
     assert _obligation(api, workspace, s["meera"])["due"]["value"] == 14  # the authored timing stands
     extra = api("mira").post(f"{W(workspace)}/patients/{s['meera']}/follow-ups", {"purpose": "Administrative reminder call", "due": DAY(10), "owner_username": "mira"})["target"]["id"]
     api("mira").fail(f"{W(workspace)}/follow-ups/{extra}/propose-due-change", {"expected_revision": 1, "due": DAY(11), "reason": "Not an authored obligation"}, code="not_authored")
+
+
+def test_cancelling_authored_followup_opens_clinical_review_and_preserves_signed_plan(api, workspace):
+    s = meera_planned(api, workspace)
+    before = api("rao").get(f"{W(workspace)}/plans/{s['plan']}")
+    obligation = _obligation(api, workspace, s["meera"])
+    api("mira").post(f"{W(workspace)}/follow-ups/{obligation['id']}/cancel", {"expected_revision": obligation["revision"], "reason": "Patient requested cancellation of the scheduled duty."})
+    after = api("rao").get(f"{W(workspace)}/plans/{s['plan']}")
+    assert after["approval"]["id"] == before["approval"]["id"] and after["plan"]["status"] == "approved"
+    assert after["currency"]["status"] == "review_needed" and len(open_impacts(api, workspace)) == 1

@@ -1,7 +1,8 @@
 """Author the fictional department-journey source pack (U4).
 
-Everything here is invented for workflow demonstration: no real patient, study subject, laboratory
-or clinical recommendation. Values are plausible-looking placeholders, not clinical guidance.
+Patient documents are invented for workflow demonstration: no real patient, study subject or laboratory.
+Research briefs are original, attributed summaries of published sources, with access and appraisal limits.
+Neither pack is a clinical recommendation. Patient values are placeholders, not clinical guidance.
 The gold annotations are written from the authoring specification below (the intended assertions),
 independently of the runtime extractor, and are read only by tests.
 
@@ -23,7 +24,7 @@ PATIENTS = {
     "meera": {"display_name": "Meera (fictional)", "identifiers": [{"system": MRN, "value": "GEEVI-DEMO-0001"}],
               "summary": "Fictional adult referred with a new AML presentation.", "episode_title": "New AML presentation (fictional)"},
     "arun": {"display_name": "Arun (fictional)", "identifiers": [{"system": MRN, "value": "GEEVI-DEMO-0002"}],
-             "summary": "Fictional older adult referred with a new AML presentation.", "episode_title": "New AML presentation (fictional)"},
+             "summary": "Fictional AML case with a documented first treatment cycle and subsequent response assessment.", "episode_title": "AML treatment and response review (fictional)"},
 }
 NORTH_LAB, NORTH_PATH, EAST = "Fictional Northside Laboratory", "Fictional Northside Pathology", "Fictional Eastbank Genetics"
 
@@ -126,25 +127,42 @@ SPECS = [
         sections=[("SCANNED REPORT", [a("LVEF", "55 % (as printed on the scanned page)", line="LVEF: 55 %")])],
         expected={"candidates": 0, "manual_entry_required": True},
         note="Image-only original: no machine findings are extracted; a reviewer transcribes with a marked region."),
+    doc("arun-treatment-summary", "arun", "treatment_summary", "Treatment course and discharge summary", "Fictional Northside Oncology", "ONC-4410", "treatment", received_day=35,
+        header=[("Author", "Dr. Fictional Treating Oncologist"), ("Clinical date", "Day 35"), ("Issued", "Day 35"), ("Report status", "Final")],
+        sections=[("TREATMENT COURSE", [
+            a("Treatment received", "Azacitidine plus venetoclax; first cycle documented in this fictional discharge summary"),
+            a("Treatment period", "Day 8 to Day 35; dose and administration records are not supplied"),
+            a("Treatment intent", "Disease-directed treatment, as stated by the treating team"),
+            a("Treatment complications", "Febrile neutropenia on Day 20; admitted and treated; fever resolved before discharge"),
+            a("Treatment modification", "Venetoclax interrupted during the admission, according to the discharge note; restart decision not supplied")]),
+                  ("DISCHARGE STATUS", [a("Current symptoms", "Fatigue; no fever at discharge, as recorded on Day 35")])],
+        note="Fictional recorded treatment history, not a prescription. Complications are reported events, not adjudicated causality."),
+    doc("arun-response-assessment", "arun", "response_assessment", "Post-cycle marrow and response review", NORTH_PATH, "MAR-3380", "response", received_day=38,
+        header=[("Author", "Dr. Fictional Pathologist"), ("Issued", "Day 38"), ("Report status", "Final")],
+        parts=[("A", "Bone marrow aspirate. Collected Day 36")],
+        sections=[("POST-CYCLE FINDINGS", [
+            a("Blast percentage", "8 % of nucleated cells (500-cell differential)", part="Part A"),
+            a("Measurable residual disease", "Not available; assay not performed on this sample", "untested", part="Part A"),
+            a("Extramedullary assessment", "Not reported in this marrow report", "unreported", part="Part A")]),
+                  ("RESPONSE REVIEW", [
+            a("Reported response", "Residual marrow blasts reported; formal remission category not assigned in this source", part="Part A"),
+            a("Response assessment date", "Day 36; after the documented first cycle", part="Part A")])],
+        note="Do not infer complete remission, molecular response or an AML stage. Formal response and next treatment remain clinician decisions."),
 ]
 
+# Original, attributed summaries of verified publications; no fabricated research studies.
+REFERENCE_CATALOG = json.loads((Path(__file__).resolve().parents[1] / "app" / "reference_catalog.json").read_text())
 RESEARCH = [
-    {"id": "research-preparation-audit", "file": "research-preparation-audit.pdf", "label": "synthetic",
-     "citation": "Fictional Department Audit Group. Completeness of new-case preparation before the first planning visit. Synthetic teaching note, 2026.",
-     "title": "Synthetic audit note: new-case preparation completeness",
-     "lines": ["Design: Retrospective fictional audit of 40 invented new-case preparation packets.",
-               "Population: Invented adult new-case referrals to a fictional haematology-oncology service.",
-               "Finding 1: Packets with documented identity review of every source document had fewer callbacks for missing information.",
-               "Finding 2: Recording patient goals before scheduling reduced rescheduled preparation visits in this invented sample.",
-               "Finding 3: Handoffs that were explicitly accepted by a named team member were completed more often than unacknowledged handoffs.",
-               "Limitation: Invented data for software demonstration; single fictional site; no clinical outcome was measured.",
-               "Limitation: No comparison group; the direction of any association is unknown."]},
-    {"id": "research-caregiver-contact", "file": "research-caregiver-contact.pdf", "label": "synthetic",
-     "citation": "Fictional Department Audit Group. Caregiver contact confirmation and handoff delays. Synthetic teaching note, 2026.",
-     "title": "Synthetic audit note: caregiver contact confirmation",
-     "lines": ["Design: Fictional before-and-after audit of 30 invented handoffs.",
-               "Finding 1: Handoffs with a confirmed caregiver contact recorded in advance had fewer same-day delays in this invented sample.",
-               "Limitation: Invented data for software demonstration; not evidence for any clinical decision."]},
+    {"id": r["id"], "file": f"research-{r['id']}.pdf", "label": "public_reference", "citation": r["citation"],
+     "title": r["title"], "reference": r,
+     "lines": [f"Source type: {r['source_type']}", f"Publication date: {r['publication_date']}",
+               f"Citation: {r['citation']}", f"Question: {r['question']}", f"Population: {r['population']}",
+               f"Intervention: {r['intervention']}", f"Comparator: {r['comparator']}", f"Outcomes: {r['outcomes']}",
+               f"Finding 1: {r['findings']}", f"Limitations: {r['limitations']}", f"Applicability: {r['applicability']}",
+               f"Reuse and access: {r['license_note']}",
+               "Original Geevi evidence brief, not the original article or a treatment recommendation.",
+               f"Sources verified: {REFERENCE_CATALOG['verified_on']}. Full-text appraisal and a current literature review remain necessary."]}
+    for r in REFERENCE_CATALOG["sources"]
 ]
 
 NOTE = "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
@@ -162,7 +180,7 @@ REQUIREMENTS_V1 = [
      "gate": "step:STEP-PLANNING-VISIT", "waiver": {"allowed": True, "exception_type": "clinical"}, "watch": ["reports/molecular"], "note": NOTE},
 ]
 REQUIREMENTS_V2 = REQUIREMENTS_V1 + [
-    {"id": "REQ-CAREGIVER", "kind": "operational", "text": "A caregiver contact for the handoff is confirmed and documented, or the patient's choice not to name one is recorded.",
+    {"id": "REQ-TRIAL-CONTEXT", "kind": "context", "text": "Patient-specific fitness, comorbidity, prior treatment and support context are documented before interpreting trial applicability.",
      "gate": "plan_approval", "waiver": {"allowed": False}, "watch": ["discussion"], "note": NOTE},
 ]
 SCENARIO = {
@@ -170,28 +188,51 @@ SCENARIO = {
     "time_anchor": "Day 0 = referral received. Relative days illustrate workflow only, not recommended clinical timing.",
     "patients": PATIENTS,
     "research": {
-        "question_v1": {"title": "Does structured new-case preparation reduce avoidable callbacks?",
-                        "question": "For new referrals to the fictional service, is documented identity review, patient-goal recording and acknowledged handoff associated with fewer preparation callbacks?",
-                        "scope": "Operational case-preparation workflow of the fictional AML service.",
-                        "intended_use": "Inform a departmental preparation protocol and handoff SOP. Not for individual treatment recommendations."},
-        "appraisal_v1": {"population": "Invented adult new-case referrals (as reported in the synthetic note)", "intervention": "Structured preparation packet with identity review and acknowledged handoff",
-                         "comparator": "None reported", "outcome": "Callbacks for missing information; completed handoffs", "timepoint": "Before first planning visit",
-                         "study_design": "Retrospective fictional audit (as reported)", "findings": "The synthetic note reports fewer callbacks with documented identity review and more completed handoffs when explicitly accepted.",
-                         "uncertainty": "Direction and size of any effect are unknown.", "limitations": "Invented single-site data, no comparison group, no clinical outcomes."},
-        "question_v2": {"title": "Should caregiver contact be confirmed before handoff?",
-                        "question": "Does confirming a caregiver contact before handoff reduce same-day delays?",
-                        "scope": "Handoff step of the fictional preparation pathway.", "intended_use": "Consider a revision of the departmental preparation protocol."},
-        "appraisal_v2": {"population": "Invented handoffs (as reported)", "intervention": "Caregiver contact confirmed in advance", "comparator": "Earlier period without confirmation",
-                         "outcome": "Same-day delays", "timepoint": "Day of handoff", "study_design": "Fictional before-and-after audit (as reported)",
-                         "findings": "The synthetic note reports fewer same-day delays with a confirmed contact.", "uncertainty": "Confounding by period is likely.",
-                         "limitations": "Invented data; not evidence for any clinical decision."},
-        "question_insufficient": {"title": "Does weekend scheduling change preparation completeness?", "question": "Is weekend scheduling associated with preparation completeness?",
-                                  "scope": "Scheduling of preparation visits.", "intended_use": "Exploratory; no protocol change proposed."},
+    "question_v1": {
+        "title": "ELN 2022 AML recommendations — evidence brief",
+        "question": "Which diagnostic, genetic-risk and response-assessment information should be reviewed before an AML case is discussed under a departmental pathway?",
+        "scope": "AML departmental evidence review and individual applicability.",
+        "intended_use": "Inform a reviewed case-readiness pathway; no automatic treatment recommendation."
     },
-    "protocol": {"title": "New AML case preparation pathway (fictional workflow protocol)",
-                 "scope": "Preparation of new AML referrals in the fictional service, from referral to the first planning visit.",
+    "appraisal_v1": {
+        "population": "Adults with AML; this is an expert recommendations document, not a randomized patient cohort.",
+        "intervention": "Not applicable: recommendations and classification framework.",
+        "comparator": "Not applicable: no experimental treatment comparison.",
+        "outcome": "Updated disease and genetic-risk classification Genomic diagnostics and measurable residual disease assessment Revised response criteria and management recommendations",
+        "timepoint": "As reported in the dated publication; check the source version.",
+        "study_design": "Expert-panel recommendations",
+        "findings": "The 2022 panel update addresses advances in molecular classification, genomic diagnostics, measurable residual disease and AML therapies. Its abstract identifies revisions to genetic-risk classification and response criteria; it is a reference for documenting the framework used in a case assessment, not an automatic classifier.",
+        "uncertainty": "Bounded abstract/source-record appraisal. Full methods and current evidence have not been comprehensively reviewed.",
+        "limitations": "The PubMed citation and abstract were verified. The publisher full-text page returned a security-verification 403, so detailed tables and workup rules were not independently reviewed in this research pass. Published in 2022. This brief does not establish that the source is the latest guideline or that one risk framework applies to every treatment context. A recommendations document does not supply an individual patient's diagnosis, fitness assessment or treatment decision."
+    },
+    "question_v2": {
+        "title": "VIALE-A — randomized-trial appraisal brief",
+        "question": "In previously untreated AML unsuitable for standard induction, what benefits, harms and applicability limits were reported for azacitidine plus venetoclax compared with azacitidine plus placebo?",
+        "scope": "AML departmental evidence review and individual applicability.",
+        "intended_use": "Inform a reviewed case-readiness pathway; no automatic treatment recommendation."
+    },
+    "appraisal_v2": {
+        "population": "Original 2020 intention-to-treat analysis: 431 patients, 286 combination and 145 control; median age 76. Patients were previously untreated and considered ineligible for standard induction because of age 75 or older, coexisting conditions, or both.",
+        "intervention": "Azacitidine plus venetoclax, described for evidence appraisal only; no dosing instructions are included.",
+        "comparator": "Azacitidine plus placebo.",
+        "outcome": "Primary endpoint in the original publication: overall survival Complete remission and composite complete remission Adverse events and serious adverse events",
+        "timepoint": "As reported in the dated publication; check the source version.",
+        "study_design": "Phase 3 randomized controlled trial",
+        "findings": "At median follow-up 20.5 months, median overall survival was 14.7 versus 9.6 months; hazard ratio for death 0.66, 95% confidence interval 0.52–0.85. Composite complete remission was 66.4% versus 28.3%. Grade 3 or higher febrile neutropenia occurred in 42% versus 19%; serious adverse events in 83% versus 73%. Benefits and harms should be appraised together.",
+        "uncertainty": "Bounded abstract/source-record appraisal. Full methods and current evidence have not been comprehensively reviewed.",
+        "limitations": "The original publication's abstract and trial identifier were verified; the full paper and supplements were not appraised in this pass. The study population was unsuitable for standard induction. Results cannot be generalized automatically to all newly diagnosed AML, an individual molecular subgroup, or a patient without a documented fitness assessment. Funded by AbbVie and Genentech. The brief is a starter appraisal, not a systematic review or current treatment recommendation. The current registry lists 443 actual enrollment, a later 2021 data cutoff and last update posted2026-06-11. These are distinct from the original 2020 paper's 431-person analysis; denominators and versions must not be merged."
+    },
+    "question_insufficient": {
+        "title": "Can an ex vivo assay establish an individual clinical benefit?",
+        "question": "Does research assay evidence establish clinical benefit for this individual, and what evidence is still missing?",
+        "scope": "Research measurement versus clinical decision.",
+        "intended_use": "Document insufficient evidence; do not infer treatment selection from a research assay."
+    }
+},
+    "protocol": {"title": "AML case review and follow-up pathway (fictional workflow protocol)",
+                 "scope": "Case preparation for AML referrals and follow-up planning reviews in the fictional service. Review disease findings, any treatment received, response, harms and patient goals before the next planning visit. This operational pathway does not define drug treatment or clinical eligibility.",
                  "v1": {"requirements": REQUIREMENTS_V1, "summary": "Initial pathway."},
-                 "v2": {"requirements": REQUIREMENTS_V2, "summary": "Adds caregiver contact confirmation before handoff."}},
+                 "v2": {"requirements": REQUIREMENTS_V2, "summary": "Adds individual-context review before interpreting trial evidence; no regimen or eligibility is inferred."}},
     "sop": {"title": "Case preparation and handoff SOP (fictional)", "purpose": "Role-owned operational steps for preparing a new case and handing work to the care team. Steps create task specifications, not clinical orders.",
             "escalation": "Fictional AML coordinator desk",
             "steps": [
@@ -230,6 +271,8 @@ def _header_lines(spec: dict) -> list[str]:
 
 
 def render_pdf(spec: dict) -> bytes:
+    import textwrap
+
     from reportlab.lib.pagesizes import A4
     from reportlab.pdfgen import canvas
     buf = io.BytesIO()
@@ -267,7 +310,11 @@ def render_pdf(spec: dict) -> bytes:
                 for x, cell in zip((50, 230, 320, 420), item["row"], strict=True):
                     c.drawString(x, y, cell)
             else:
-                c.drawString(62, y, item["line"])
+                lines = textwrap.wrap(item["line"], width=80, break_long_words=False, break_on_hyphens=False)
+                for index, line in enumerate(lines):
+                    if index:
+                        y -= 14
+                    c.drawString(62 if index == 0 else 82, y, line)
             y -= 16
     c.setFont("Helvetica-Oblique", 8)
     c.drawString(50, 40, "Invented content for software workflow demonstration only. " + BANNER.split(" - ")[0].title() + ".")
@@ -277,29 +324,35 @@ def render_pdf(spec: dict) -> bytes:
 
 
 def render_research_pdf(item: dict) -> bytes:
+    """Paginated original brief; never relabel a summary as the publisher's original."""
+    import textwrap
+
     from reportlab.lib.pagesizes import A4
     from reportlab.pdfgen import canvas
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=A4, invariant=1)
-    y = A4[1] - 50
-    c.setFont("Helvetica-Bold", 8)
-    c.drawString(50, y, "SYNTHETIC RESEARCH NOTE - INVENTED DATA - NOT EVIDENCE FOR CLINICAL DECISIONS")
-    y -= 28
-    c.setFont("Helvetica-Bold", 13)
-    c.drawString(50, y, item["title"])
-    y -= 24
-    c.setFont("Helvetica", 10)
-    for line in item["lines"]:
-        words, current = line.split(), ""
-        for word in words:
-            if c.stringWidth(current + " " + word, "Helvetica", 10) > 490:
-                c.drawString(50, y, current.strip())
-                y -= 14
-                current = "   " + word
-            else:
-                current += " " + word
-        c.drawString(50, y, current.strip() if not current.startswith("   ") else current)
-        y -= 20
+    c.setTitle(item["title"])
+    page = 0
+    def new_page():
+        nonlocal page
+        if page:
+            c.showPage()
+        page += 1
+        c.setFont("Helvetica-Bold", 9)
+        c.drawString(50, A4[1] - 42, "GEEVI EVIDENCE BRIEF - PUBLISHED SOURCE - ATTRIBUTED SUMMARY")
+        c.setFont("Helvetica", 8)
+        c.drawString(50, 30, f"Not the original publication. Not a treatment recommendation. Page {page}")
+        return A4[1] - 70
+    y = new_page()
+    for paragraph in [item["title"], *item["lines"]]:
+        paragraph = paragraph.replace("—", "-").replace("–", "-").replace("’", "'").replace("≥", ">=")
+        for line in textwrap.wrap(paragraph, width=92, break_long_words=True):
+            if y < 62:
+                y = new_page()
+            c.setFont("Helvetica", 10)
+            c.drawString(50, y, line)
+            y -= 14
+        y -= 12
     c.showPage()
     c.save()
     return buf.getvalue()
@@ -359,7 +412,7 @@ def build(out: Path = OUT) -> dict:
         (out / "inputs" / item["file"]).write_bytes(data)
         manifest["research"].append({"id": item["id"], "file": f"inputs/{item['file']}", "media_type": "application/pdf",
                                      "sha256": hashlib.sha256(data).hexdigest(), "length": len(data), "citation": item["citation"],
-                                     "title": item["title"], "label": item["label"]})
+                                     "title": item["title"], "label": item["label"], "reference": item["reference"]})
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (out / "scenario.json").write_text(json.dumps(SCENARIO, indent=2) + "\n")
     (out / "references" / "public-references.json").write_text(json.dumps({"label": "public_reference", "references": PUBLIC_REFERENCES}, indent=2) + "\n")

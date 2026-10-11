@@ -8,7 +8,7 @@ import { ApiError, api, setCsrfToken, unwrap } from "@/lib/api/client";
 import { clearRecords } from "@/lib/session/session";
 import { landingPath } from "./HomeRedirect";
 
-export function LoginForm() {
+export function LoginForm({ returnTo }: { returnTo?: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [username, setUsername] = useState("");
@@ -31,7 +31,15 @@ export function LoginForm() {
       setCsrfToken(session.csrf_token);
       clearRecords(queryClient); // a new account never inherits the previous account's cached records
       queryClient.setQueryData(["session"], session);
-      router.replace(session.workspaces.length ? landingPath(session.workspaces[0]) : "/");
+      let destination = session.workspaces.length ? landingPath(session.workspaces[0]) : "/";
+      if (returnTo && URL.canParse(returnTo, "https://geevi.invalid")) {
+        const candidate = new URL(returnTo, "https://geevi.invalid");
+        const match = candidate.pathname.match(/^\/w\/([0-9a-f-]{36})(?:\/|$)/);
+        if (candidate.origin === "https://geevi.invalid" && match && session.workspaces.some((w) => w.id === match[1])) {
+          destination = candidate.pathname + candidate.search + candidate.hash;
+        }
+      }
+      router.replace(destination);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught : new ApiError("unexpected_failure", "Sign-in failed.", 0));
     } finally {
@@ -45,7 +53,7 @@ export function LoginForm() {
       <p>Oncology department journey — fictional full-stack demonstration.</p>
       <div className="banner" role="note">
         Development identities only. These are fictional accounts with demonstration grants, not institutional accounts.
-        All patients and documents are invented; nothing here is clinically validated.
+        Patients and approvals are fictional. Research briefs cite published sources. Clinical use remains unvalidated.
       </div>
       <form className="card" onSubmit={submit} aria-label="Sign in" data-ready={ready}>
         <h2>Sign in</h2>

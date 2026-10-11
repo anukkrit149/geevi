@@ -92,7 +92,7 @@ test("explicit legacy snapshot with the exact original: staged, disclosed, activ
   await rao.getByRole("link", { name: "Meera (legacy import)" }).click();
   await expect(rao.getByTestId("legacy-records")).toContainText("not reviewed publications and not signatures");
   await expect(rao.getByTestId("legacy-records")).toContainText("protocol");
-  await rao.getByRole("link", { name: "Sources" }).click();
+  await rao.getByRole("link", { name: "Reports", exact: true }).click();
   await rao.getByRole("link", { name: "Intake report" }).click();
   await expect(rao.getByTestId("document-head")).toContainText(hash);
   await expect(rao.getByTestId("source-canvas")).toHaveAttribute("data-rendered", "1");
@@ -127,7 +127,7 @@ test("a metadata-only export packet is never a complete migration; its original 
   const mira = await signIn(browser, "mira");
   await mira.goto(`/w/${ws}/patients`);
   await mira.getByRole("link", { name: "Meera (legacy import)" }).click();
-  await mira.getByRole("link", { name: "Sources" }).click();
+  await mira.getByRole("link", { name: "Reports", exact: true }).click();
   await expect(mira.getByTestId("source-list")).toContainText("unavailable");
   await mira.getByRole("link", { name: "Intake report" }).click();
   await expect(mira.getByTestId("original-unavailable")).toContainText("Supply the exact original file");

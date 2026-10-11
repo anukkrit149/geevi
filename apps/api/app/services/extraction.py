@@ -25,12 +25,16 @@ VOCAB: dict[str, dict[str, str]] = {
     "molecular": {"NPM1": "biology", "FLT3-ITD": "biology", "FLT3-TKD": "biology", "TP53": "biology", "IDH1": "biology",
                   "IDH2": "biology", "CEBPA": "biology"},
     "organ_assessment": {"LVEF": "fitness", "Kidney function": "fitness", "Liver function": "fitness"},
+    "treatment_summary": {"Treatment received": "history", "Treatment period": "history", "Treatment intent": "history",
+                          "Treatment complications": "history", "Treatment modification": "history", "Current symptoms": "current"},
+    "response_assessment": {"Blast percentage": "extent", "Measurable residual disease": "extent",
+                            "Extramedullary assessment": "extent", "Reported response": "history", "Response assessment date": "history"},
 }
 TABLE_TYPES = {"blood_panel": "current"}
 HEADER_KEYS = {"patient id": "patient_identifier", "patient": "patient_name", "laboratory": "issuer", "issuer": "issuer",
                "accession": "accession", "report type": "report_type", "report status": "issued_status",
                "reported by": "author", "author": "author", "collected": "collected", "received": "received",
-               "issued": "issued", "method": "method", "panel": "panel", "limitations": "limitations",
+               "issued": "issued", "clinical date": "clinical_date", "method": "method", "panel": "panel", "limitations": "limitations",
                "relation": "relation", "affects": "affects"}
 
 _STATE_RULES = [
@@ -59,8 +63,19 @@ def parse_pdf(data: bytes) -> list[dict[str, Any]]:
     pages = []
     with pdfplumber.open(io.BytesIO(data)) as pdf:
         for number, page in enumerate(pdf.pages, start=1):
-            lines = [{"text": line["text"].strip(), "bbox": [round(line["x0"], 2), round(line["top"], 2), round(line["x1"], 2), round(line["bottom"], 2)]}
-                     for line in page.extract_text_lines() if line["text"].strip()]
+            lines = []
+            for line in page.extract_text_lines():
+                if not line["text"].strip():
+                    continue
+                box = [round(line["x0"], 2), round(line["top"], 2), round(line["x1"], 2), round(line["bottom"], 2)]
+                # This known report layout indents wrapped assertion continuations by 20 points.
+                # Preserve the full wording and the complete original region for source review.
+                if lines and abs(box[0] - 82) < 0.5 and abs(lines[-1]["bbox"][0] - 62) < 0.5 and box[1] - lines[-1]["bbox"][3] < 8:
+                    lines[-1]["text"] += " " + line["text"].strip()
+                    lines[-1]["bbox"][2] = max(lines[-1]["bbox"][2], box[2])
+                    lines[-1]["bbox"][3] = box[3]
+                else:
+                    lines.append({"text": line["text"].strip(), "bbox": box})
             pages.append({"number": number, "width": float(page.width), "height": float(page.height), "lines": lines})
     return pages
 

@@ -13,7 +13,7 @@ def test_manifest_files_hashes_and_time_anchors_resolve():
     for entry in [*MANIFEST["inputs"], *MANIFEST["research"]]:
         data = (FIXTURES / entry["file"]).read_bytes()
         assert hashlib.sha256(data).hexdigest() == entry["sha256"] and len(data) == entry["length"]
-        assert entry["file"].startswith("inputs/") and entry["label"] in ("fictional", "synthetic")
+        assert entry["file"].startswith("inputs/") and entry["label"] in ("fictional", "public_reference")
     for entry in MANIFEST["inputs"]:
         assert entry["patient"] in MANIFEST["patients"] and entry["received_time"]["anchor"] == "episode-day-0"
         assert (FIXTURES / "gold" / f"{entry['id']}.json").exists()
@@ -22,6 +22,19 @@ def test_manifest_files_hashes_and_time_anchors_resolve():
 def test_fixture_generation_is_reproducible():
     for spec in make_fixtures.SPECS:
         assert hashlib.sha256(make_fixtures.render(spec)).hexdigest() == INPUTS[spec["id"]]["sha256"], spec["id"]
+    for spec in make_fixtures.RESEARCH:
+        entry = next(e for e in MANIFEST["research"] if e["id"] == spec["id"])
+        assert hashlib.sha256(make_fixtures.render_research_pdf(spec)).hexdigest() == entry["sha256"]
+
+
+def test_research_briefs_are_attributed_and_separate_from_fictional_reports():
+    assert len(MANIFEST["research"]) == 3
+    for entry in MANIFEST["research"]:
+        assert entry["label"] == "public_reference" and entry["reference"]["url"].startswith("https://")
+        text = " ".join(line["text"] for page in extraction.parse_pdf(raw(entry["id"])) for line in page["lines"])
+        assert "ATTRIBUTED SUMMARY" in text and "Not the original publication" in text
+        assert "Fictional Department Audit" not in text and "GEEVI-DEMO-" not in text
+        assert entry["reference"]["limitations"] and entry["reference"]["license_note"]
 
 
 def test_inputs_are_visibly_fictional_and_not_joined_to_real_cohorts():
@@ -110,4 +123,4 @@ def test_packaged_runtime_copy_matches_the_inputs_and_carries_no_gold():
         assert (PACKAGED_FIXTURES / name).read_bytes() == (FIXTURES / name).read_bytes()
     packaged = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (PACKAGED_FIXTURES / "inputs").iterdir()}
     source = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in (FIXTURES / "inputs").iterdir()}
-    assert packaged == source and len(packaged) == 16
+    assert packaged == source and len(packaged) == len(MANIFEST["inputs"]) + len(MANIFEST["research"])

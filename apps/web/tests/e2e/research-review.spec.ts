@@ -6,7 +6,7 @@ test("insufficient evidence concludes without a protocol or recommendation; a re
   const { ws } = await newWorkspace("Research review");
   const rao = await signIn(browser, "rao");
   await rao.goto(`/w/${ws}/research`);
-  await rao.getByRole("button", { name: "Insert fictional question 3" }).click();
+  await rao.getByRole("button", { name: "Insert demo question 3" }).click();
   await rao.getByRole("button", { name: "Open question" }).click();
   await rao.waitForURL(/\/research\/[0-9a-f-]{36}$/);
   await expect(rao.getByTestId("question")).toContainText("issues no patient recommendation");
@@ -16,7 +16,7 @@ test("insufficient evidence concludes without a protocol or recommendation; a re
   await rao.getByRole("button", { name: "Conclude question" }).click();
   await expect(rao.getByTestId("error-summary")).toHaveAttribute("data-error-code", "no_accepted_evidence");
   await rao.getByLabel("Conclusion").selectOption("insufficient_evidence");
-  await rao.getByLabel("Reasoning").fill("No local or imported evidence addresses weekend scheduling.");
+  await rao.getByLabel("Reasoning").fill("The reviewed research assay evidence does not establish clinical benefit for this individual.");
   await rao.getByRole("button", { name: "Conclude question" }).click();
   await expect(rao.getByTestId("question-status")).toContainText("insufficient evidence");
   await rao.goto(`/w/${ws}/department`);

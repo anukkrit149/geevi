@@ -25,6 +25,7 @@ export function ExceptionPanel({ workspaceId, patientId }: { workspaceId: string
   const requirements = (protocol?.requirements ?? []) as Record<string, any>[];
   const [form, setForm] = useState({ requirement_id: "", departure: "", rationale: "", review_trigger: "", expires_at: "" });
   const [rationale, setRationale] = useState<Record<string, string>>({});
+  const [revision, setRevision] = useState<Record<string, { departure: string; rationale: string; review_trigger: string }>>({});
   const requirementId = form.requirement_id || requirements.find((r) => r.waiver?.allowed)?.id || "";
   const requirement = requirements.find((r) => r.id === requirementId);
 
@@ -61,6 +62,13 @@ export function ExceptionPanel({ workspaceId, patientId }: { workspaceId: string
             <p className="small">{e.expires_at ? `Expires ${when(e.expires_at)}` : `Review trigger: ${e.review_trigger}`} · approvals {e.approvals_recorded} of {String((e.required_approvals as Record<string, any>).approvals)}</p>
             {e.decisions.map((d) => <p className="small" key={d.id}>{d.decision === "approve" ? "Approved" : "Rejected"} by {d.recorded_by_name} — {d.rationale}</p>)}
             {e.next_action ? <p className="small"><strong>Next:</strong> {e.next_action} (owner of the request: {e.owner_name})</p> : null}
+            {can("exception.request") && e.recorded_by === session?.account.id && !["superseded", "withdrawn"].includes(e.status) ? <details><summary>Revise or withdraw this request</summary>
+              <TextArea label={`Revised departure for ${e.requirement_id}`} value={revision[e.id]?.departure ?? e.departure} onChange={(departure) => setRevision({ ...revision, [e.id]: { departure, rationale: revision[e.id]?.rationale ?? e.rationale, review_trigger: revision[e.id]?.review_trigger ?? e.review_trigger ?? "" } })} />
+              <TextArea label={`Revised rationale for ${e.requirement_id}`} value={revision[e.id]?.rationale ?? e.rationale} onChange={(rationale) => setRevision({ ...revision, [e.id]: { departure: revision[e.id]?.departure ?? e.departure, rationale, review_trigger: revision[e.id]?.review_trigger ?? e.review_trigger ?? "" } })} />
+              <TextInput label={`Revision review trigger for ${e.requirement_id}`} value={revision[e.id]?.review_trigger ?? e.review_trigger ?? ""} onChange={(review_trigger) => setRevision({ ...revision, [e.id]: { departure: revision[e.id]?.departure ?? e.departure, rationale: revision[e.id]?.rationale ?? e.rationale, review_trigger } })} />
+              <TextInput label={`Withdrawal reason for ${e.requirement_id}`} value={rationale[e.id] ?? ""} onChange={(v) => setRationale({ ...rationale, [e.id]: v })} />
+              <div className="row"><Button onClick={() => action.run(`revise:${e.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/exceptions/{request_id}/revise", { params: { path: { workspace_id: workspaceId, request_id: e.id } }, body: { command_id, expected_revision: e.revision, departure: revision[e.id]?.departure ?? e.departure, rationale: revision[e.id]?.rationale ?? e.rationale, review_trigger: revision[e.id]?.review_trigger ?? e.review_trigger, expires_at: e.expires_at, evidence: e.evidence as string[] } }), "Successor exception request created; approvals must be recorded again")}>Create revised request</Button><Button variant="danger" disabled={(rationale[e.id] ?? "").trim().length < 8} onClick={() => action.run(`withdraw:${e.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/exceptions/{request_id}/withdraw", { params: { path: { workspace_id: workspaceId, request_id: e.id } }, body: { command_id, expected_revision: e.revision, reason: rationale[e.id] } }), "Exception withdrawn; affected plans require review")}>Withdraw request</Button></div><p className="small">A revised request starts a new version and requires fresh decisions.</p>
+            </details> : null}
             {e.effective_status === "pending" && can(capability) && !decided ? (
               <div>
                 <TextInput label={`Decision rationale for ${e.requirement_id}`} value={rationale[e.id] ?? ""} onChange={(v) => setRationale({ ...rationale, [e.id]: v })} />

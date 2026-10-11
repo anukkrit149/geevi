@@ -1,0 +1,50 @@
+{
+  "input": "arun-response-assessment",
+  "label": "fictional",
+  "purpose": "test-only expected output; never read by the runtime",
+  "claimed_patient_identifier": "GEEVI-DEMO-0002",
+  "assertions": [
+    {
+      "analyte": "Blast percentage",
+      "value_text": "8 % of nucleated cells (500-cell differential)",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Measurable residual disease",
+      "value_text": "Not available; assay not performed on this sample",
+      "result_state": "untested",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Extramedullary assessment",
+      "value_text": "Not reported in this marrow report",
+      "result_state": "unreported",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Reported response",
+      "value_text": "Residual marrow blasts reported; formal remission category not assigned in this source",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    },
+    {
+      "analyte": "Response assessment date",
+      "value_text": "Day 36; after the documented first cycle",
+      "result_state": "reported_value",
+      "specimen_label": "Part A",
+      "units": null,
+      "reference_range": null
+    }
+  ],
+  "expected": {},
+  "note": "Do not infer complete remission, molecular response or an AML stage. Formal response and next treatment remain clinician decisions."
+}

@@ -173,7 +173,7 @@ def receive_document(ctx: Ctx, body, parsed: ParsedUpload) -> dict:
             m.ReportVersion, family_id=family.id, patient_id=doc.patient_id, version_no=len(versions) + 1,
             issued_status=(header.get("issued_status") or "final").lower(), relation_kind=relation,
             predecessor_id=versions[-1].id if versions and relation != "unresolved" else None, affected_scope=affects,
-            document_ids=[str(doc.id)], effective_time=extraction.rel_day(header.get("collected")),
+            document_ids=[str(doc.id)], effective_time=extraction.rel_day(header.get("collected") or header.get("clinical_date")),
             issued_time=extraction.rel_day(header.get("issued")),
             amended_time=extraction.rel_day(header.get("issued")) if relation != "original" else None,
             scope_note=header.get("relation"))

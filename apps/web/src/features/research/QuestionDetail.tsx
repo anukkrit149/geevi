@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Badge, Button, Card, Empty, ErrorSummary, Loading, Meta, Select, TextArea, TextInput } from "@/components/ui";
 import { ReviewPanel } from "@/features/department/ReviewPanel";
@@ -29,6 +30,7 @@ function AppraisalEditor({ workspaceId, questionId, appraisal, sources }: { work
   const source = active.find((s) => s.id === (sourceId || citations[0]?.source_id)) ?? active[0];
   const reviewers = (members.data ?? []).filter((m) => m.capabilities.includes("evidence.review"));
   const [reviewer, setReviewer] = useState("");
+  const [passageSearch, setPassageSearch] = useState("");
   const cited = (passageId: string) => citations.some((c) => c.source_id === source?.id && c.passage_id === passageId);
   const body = () => ({ ...content, citations });
 
@@ -56,8 +58,8 @@ function AppraisalEditor({ workspaceId, questionId, appraisal, sources }: { work
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
       {scenario.data ? (
         <div className="row">
-          <Button variant="quiet" onClick={() => setContent(scenario.data!.research.appraisal_v1)}>Insert fictional appraisal 1</Button>
-          <Button variant="quiet" onClick={() => setContent(scenario.data!.research.appraisal_v2)}>Insert fictional appraisal 2</Button>
+          <Button variant="quiet" onClick={() => setContent(scenario.data!.research.appraisal_v1)}>Insert evidence appraisal example 1</Button>
+          <Button variant="quiet" onClick={() => setContent(scenario.data!.research.appraisal_v2)}>Insert evidence appraisal example 2</Button>
         </div>
       ) : null}
       <div className="grid grid-2">
@@ -68,7 +70,9 @@ function AppraisalEditor({ workspaceId, questionId, appraisal, sources }: { work
         {active.length ? (
           <>
             <Select label="Evidence source" value={source?.id ?? ""} onChange={setSourceId} options={active.map((s) => ({ value: s.id, label: `${s.title} (v${s.version_no})` }))} />
-            {source?.passages.length ? (source.passages as Record<string, any>[]).map((p) => (
+            {source ? <p><Link href={`/w/${workspaceId}/research/sources/${source.id}`}>Open evidence document and original citation</Link></p> : null}
+            <TextInput label="Find a source passage" value={passageSearch} onChange={setPassageSearch} hint="Search an outcome, eligibility term, finding or limitation." />
+            {source?.passages.length ? (source.passages as Record<string, any>[]).filter((p) => String(p.text).toLowerCase().includes(passageSearch.toLowerCase())).map((p) => (
               <label className="check" key={p.id}>
                 <input type="checkbox" checked={cited(p.id)} onChange={(e) => setCitations(e.target.checked ? [...citations, { source_id: source.id, passage_id: p.id }]
                   : citations.filter((c) => !(c.source_id === source.id && c.passage_id === p.id)))} />
@@ -114,6 +118,7 @@ export function QuestionDetail({ workspaceId, questionId }: { workspaceId: strin
         <Meta items={[["Scope", question.scope], ["Intended use", question.intended_use], ["Owner", question.owner_name], ["Opened", when(question.recorded_at)],
           ["Conclusion", question.conclusion ? `${words(question.conclusion)} — ${question.conclusion_note}` : null]]} />
         <p className="small">{detail.data.recommendation_notice}</p>
+        {(question.origin as { patient_id?: string } | null)?.patient_id ? <Link href={`/w/${workspaceId}/patients/${String((question.origin as { patient_id: string }).patient_id)}`}>Patient case that raised this question</Link> : null}
       </Card>
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
       <Card title="Evidence appraisals" testId="appraisals">
@@ -122,8 +127,8 @@ export function QuestionDetail({ workspaceId, questionId }: { workspaceId: strin
             <div className="row"><strong>Appraisal v{a.version_no}</strong><Badge value={a.status} />{a.review_needed ? <Badge value="review_needed" label="review needed" /> : null}
               <span className="small">author {a.recorded_by_name}</span></div>
             <p className="quote">{String((a.content as Content).findings)}</p>
-            <p className="small">Design: {String((a.content as Content).study_design)} · Limitations: {String((a.content as Content).limitations)}</p>
-            {(a.citations as Citation[]).map((c) => <p className="small" key={c.passage_id}>Cites: “{passageText(c) ?? c.passage_id}”</p>)}
+            <dl>{FIELDS.filter(([key]) => key !== "findings").map(([key, label]) => <div className="item" key={key}><dt className="small"><strong>{label}</strong></dt><dd>{String((a.content as Content)[key] || "Not recorded")}</dd></div>)}</dl>
+            {(a.citations as Citation[]).map((c) => <p className="small" key={c.passage_id}>Cites: “{passageText(c) ?? c.passage_id}” · <Link href={`/w/${workspaceId}/research/sources/${c.source_id}`}>Open cited document</Link></p>)}
             {a.review_needed_reason ? <p className="small">⚠ {a.review_needed_reason}</p> : null}
             {can("evidence.author") && a.recorded_by === session?.account.id && ["accepted", "changes_requested"].includes(a.status) && !inFlight && question.status === "open" ? (
               <Button onClick={() => action.run(`revise:${a.id}`, (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/research/appraisals/{appraisal_id}/revise", {

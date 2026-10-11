@@ -215,7 +215,29 @@ def view(ctx: Ctx, plan: PatientPlanVersion) -> dict:
     pending_changes = review_dependencies.changes_since(ctx, packet.read_set, packet.watch_set) if packet is not None and plan.status == "submitted" else []
     return {"plan": plan, "packet": packet, "approval": approvals[-1] if approvals else None, "disposition": disposition_of(ctx, plan),
             "dispositions": ctx.all(PlanDisposition, PlanDisposition.plan_version_id == plan.id), "currency": currency(ctx, plan),
-            "gates": gates(ctx, plan), "packet_changes": pending_changes}
+            "gates": gates(ctx, plan), "packet_changes": pending_changes, "decision_context": decision_context(ctx, plan)}
+
+
+def decision_context(ctx: Ctx, plan: PatientPlanVersion) -> dict:
+    """Readable clinical context from the exact versions pinned to this plan, never the latest profile."""
+    applicability = ctx.get(ApplicabilityReview, plan.applicability_id)
+    snapshot = ctx.get(m.ProfileSnapshot, applicability.snapshot_id)
+    protocol = ctx.get(ProtocolVersion, plan.protocol_version_id)
+    assessment = ctx.find(m.ClinicalAssessment, snapshot.assessment_id)
+    discussion = ctx.find(m.PatientDiscussion, plan.discussion_id)
+    findings = [ctx.get(m.ObservationVersion, UUID(x)) for x in snapshot.observation_ids]
+    requirements = {r["id"]: r["text"] for r in protocol.requirements}
+    requests = [ctx.get(ExceptionRequest, UUID(x)) for x in plan.exception_ids]
+    return {"protocol_title": protocol.title, "protocol_version": protocol.version_no, "protocol_scope": protocol.scope,
+            "assessment": assessment.narrative if assessment else None, "uncertainty": assessment.uncertainty if assessment else None,
+            "patient_goals": discussion.goals if discussion else None, "preferences": discussion.preferences if discussion else None,
+            "knowledge_cutoff_seq": snapshot.knowledge_cutoff_seq,
+            "findings": [{"analyte": o.analyte, "value_text": o.value_text, "units": o.units, "result_state": o.result_state,
+                          "specimen_label": source_service.observation_view(ctx, o)["specimen_label"], "document_id": str(o.document_id)} for o in findings],
+            "unresolved": snapshot.unresolved,
+            "criteria": [{**c, "requirement_text": requirements.get(c["requirement_id"], c["requirement_id"])} for c in applicability.criteria],
+            "exceptions": [{"requirement_id": e.requirement_id, "departure": e.departure, "rationale": e.rationale,
+                            "exception_type": e.exception_type, "effective_status": review_dependencies.exception_state(e)} for e in requests]}
 
 
 def require_actionable(ctx: Ctx, plan: PatientPlanVersion, action: str) -> None:

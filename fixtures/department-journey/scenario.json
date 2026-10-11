@@ -22,55 +22,55 @@
           "value": "GEEVI-DEMO-0002"
         }
       ],
-      "summary": "Fictional older adult referred with a new AML presentation.",
-      "episode_title": "New AML presentation (fictional)"
+      "summary": "Fictional AML case with a documented first treatment cycle and subsequent response assessment.",
+      "episode_title": "AML treatment and response review (fictional)"
     }
   },
   "research": {
     "question_v1": {
-      "title": "Does structured new-case preparation reduce avoidable callbacks?",
-      "question": "For new referrals to the fictional service, is documented identity review, patient-goal recording and acknowledged handoff associated with fewer preparation callbacks?",
-      "scope": "Operational case-preparation workflow of the fictional AML service.",
-      "intended_use": "Inform a departmental preparation protocol and handoff SOP. Not for individual treatment recommendations."
+      "title": "ELN 2022 AML recommendations \u2014 evidence brief",
+      "question": "Which diagnostic, genetic-risk and response-assessment information should be reviewed before an AML case is discussed under a departmental pathway?",
+      "scope": "AML departmental evidence review and individual applicability.",
+      "intended_use": "Inform a reviewed case-readiness pathway; no automatic treatment recommendation."
     },
     "appraisal_v1": {
-      "population": "Invented adult new-case referrals (as reported in the synthetic note)",
-      "intervention": "Structured preparation packet with identity review and acknowledged handoff",
-      "comparator": "None reported",
-      "outcome": "Callbacks for missing information; completed handoffs",
-      "timepoint": "Before first planning visit",
-      "study_design": "Retrospective fictional audit (as reported)",
-      "findings": "The synthetic note reports fewer callbacks with documented identity review and more completed handoffs when explicitly accepted.",
-      "uncertainty": "Direction and size of any effect are unknown.",
-      "limitations": "Invented single-site data, no comparison group, no clinical outcomes."
+      "population": "Adults with AML; this is an expert recommendations document, not a randomized patient cohort.",
+      "intervention": "Not applicable: recommendations and classification framework.",
+      "comparator": "Not applicable: no experimental treatment comparison.",
+      "outcome": "Updated disease and genetic-risk classification Genomic diagnostics and measurable residual disease assessment Revised response criteria and management recommendations",
+      "timepoint": "As reported in the dated publication; check the source version.",
+      "study_design": "Expert-panel recommendations",
+      "findings": "The 2022 panel update addresses advances in molecular classification, genomic diagnostics, measurable residual disease and AML therapies. Its abstract identifies revisions to genetic-risk classification and response criteria; it is a reference for documenting the framework used in a case assessment, not an automatic classifier.",
+      "uncertainty": "Bounded abstract/source-record appraisal. Full methods and current evidence have not been comprehensively reviewed.",
+      "limitations": "The PubMed citation and abstract were verified. The publisher full-text page returned a security-verification 403, so detailed tables and workup rules were not independently reviewed in this research pass. Published in 2022. This brief does not establish that the source is the latest guideline or that one risk framework applies to every treatment context. A recommendations document does not supply an individual patient's diagnosis, fitness assessment or treatment decision."
     },
     "question_v2": {
-      "title": "Should caregiver contact be confirmed before handoff?",
-      "question": "Does confirming a caregiver contact before handoff reduce same-day delays?",
-      "scope": "Handoff step of the fictional preparation pathway.",
-      "intended_use": "Consider a revision of the departmental preparation protocol."
+      "title": "VIALE-A \u2014 randomized-trial appraisal brief",
+      "question": "In previously untreated AML unsuitable for standard induction, what benefits, harms and applicability limits were reported for azacitidine plus venetoclax compared with azacitidine plus placebo?",
+      "scope": "AML departmental evidence review and individual applicability.",
+      "intended_use": "Inform a reviewed case-readiness pathway; no automatic treatment recommendation."
     },
     "appraisal_v2": {
-      "population": "Invented handoffs (as reported)",
-      "intervention": "Caregiver contact confirmed in advance",
-      "comparator": "Earlier period without confirmation",
-      "outcome": "Same-day delays",
-      "timepoint": "Day of handoff",
-      "study_design": "Fictional before-and-after audit (as reported)",
-      "findings": "The synthetic note reports fewer same-day delays with a confirmed contact.",
-      "uncertainty": "Confounding by period is likely.",
-      "limitations": "Invented data; not evidence for any clinical decision."
+      "population": "Original 2020 intention-to-treat analysis: 431 patients, 286 combination and 145 control; median age 76. Patients were previously untreated and considered ineligible for standard induction because of age 75 or older, coexisting conditions, or both.",
+      "intervention": "Azacitidine plus venetoclax, described for evidence appraisal only; no dosing instructions are included.",
+      "comparator": "Azacitidine plus placebo.",
+      "outcome": "Primary endpoint in the original publication: overall survival Complete remission and composite complete remission Adverse events and serious adverse events",
+      "timepoint": "As reported in the dated publication; check the source version.",
+      "study_design": "Phase 3 randomized controlled trial",
+      "findings": "At median follow-up 20.5 months, median overall survival was 14.7 versus 9.6 months; hazard ratio for death 0.66, 95% confidence interval 0.52\u20130.85. Composite complete remission was 66.4% versus 28.3%. Grade 3 or higher febrile neutropenia occurred in 42% versus 19%; serious adverse events in 83% versus 73%. Benefits and harms should be appraised together.",
+      "uncertainty": "Bounded abstract/source-record appraisal. Full methods and current evidence have not been comprehensively reviewed.",
+      "limitations": "The original publication's abstract and trial identifier were verified; the full paper and supplements were not appraised in this pass. The study population was unsuitable for standard induction. Results cannot be generalized automatically to all newly diagnosed AML, an individual molecular subgroup, or a patient without a documented fitness assessment. Funded by AbbVie and Genentech. The brief is a starter appraisal, not a systematic review or current treatment recommendation. The current registry lists 443 actual enrollment, a later 2021 data cutoff and last update posted2026-06-11. These are distinct from the original 2020 paper's 431-person analysis; denominators and versions must not be merged."
     },
     "question_insufficient": {
-      "title": "Does weekend scheduling change preparation completeness?",
-      "question": "Is weekend scheduling associated with preparation completeness?",
-      "scope": "Scheduling of preparation visits.",
-      "intended_use": "Exploratory; no protocol change proposed."
+      "title": "Can an ex vivo assay establish an individual clinical benefit?",
+      "question": "Does research assay evidence establish clinical benefit for this individual, and what evidence is still missing?",
+      "scope": "Research measurement versus clinical decision.",
+      "intended_use": "Document insufficient evidence; do not infer treatment selection from a research assay."
     }
   },
   "protocol": {
-    "title": "New AML case preparation pathway (fictional workflow protocol)",
-    "scope": "Preparation of new AML referrals in the fictional service, from referral to the first planning visit.",
+    "title": "AML case review and follow-up pathway (fictional workflow protocol)",
+    "scope": "Case preparation for AML referrals and follow-up planning reviews in the fictional service. Review disease findings, any treatment received, response, harms and patient goals before the next planning visit. This operational pathway does not define drug treatment or clinical eligibility.",
     "v1": {
       "requirements": [
         {
@@ -223,9 +223,9 @@
           "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
         },
         {
-          "id": "REQ-CAREGIVER",
-          "kind": "operational",
-          "text": "A caregiver contact for the handoff is confirmed and documented, or the patient's choice not to name one is recorded.",
+          "id": "REQ-TRIAL-CONTEXT",
+          "kind": "context",
+          "text": "Patient-specific fitness, comorbidity, prior treatment and support context are documented before interpreting trial applicability.",
           "gate": "plan_approval",
           "waiver": {
             "allowed": false
@@ -236,7 +236,7 @@
           "note": "Fictional workflow requirement for software demonstration. Contains no clinical eligibility, dosing or therapy content; unvalidated."
         }
       ],
-      "summary": "Adds caregiver contact confirmation before handoff."
+      "summary": "Adds individual-context review before interpreting trial evidence; no regimen or eligibility is inferred."
     }
   },
   "sop": {

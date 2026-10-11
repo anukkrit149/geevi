@@ -24,13 +24,14 @@ export function PatientFrame({ workspaceId, patientId, children }: { workspaceId
     );
   }
   const { patient: p, identifiers, episodes } = patient.data;
-  const tabs: [string, string][] = [[base, "Profile & timeline"], [`${base}/sources`, "Sources"], [`${base}/decisions`, "Decisions"], [`${base}/care`, "Care & follow-up"]];
+  const tabs: [string, string][] = [[base, "Clinical overview"], [`${base}/sources`, "Reports"], [`${base}/decisions`, "Plan & decisions"], [`${base}/care`, "Care & follow-up"], [`${base}/history`, "Record history"]];
   return (
     <>
       <div className="page-head">
         <div>
           <h1 data-testid="patient-name">{p.display_name}</h1>
           <p>{identifiers.map((i) => `${i.system}: ${i.value}`).join(" · ")}</p>
+          {episodes.map((e) => <p className="small" key={e.id}>{e.title}</p>)}
         </div>
         <div className="row">
           <Badge value={p.data_label} />

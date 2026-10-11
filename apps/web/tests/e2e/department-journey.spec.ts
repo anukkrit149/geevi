@@ -46,7 +46,7 @@ async function verifyAll(page: Page): Promise<number> {
 async function receive(page: Page, patient: string, fixture: string, kind: string, title: string): Promise<void> {
   await page.goto(url(`/patients/${patient}/sources`));
   await page.getByLabel("Original file").setInputFiles(input(fixture));
-  await page.getByLabel("Report type").selectOption(kind);
+  await page.getByLabel("Report type", { exact: true }).selectOption(kind);
   await page.getByRole("button", { name: "Receive document" }).click();
   await expect(page.getByTestId("upload-result")).toContainText("pending");
   await page.getByTestId(`doc-${fixture}.pdf`).getByRole("link", { name: title }).click();
@@ -80,21 +80,21 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test("F1 · research question, cited appraisal, disagreement resolved by an independent reviewer", async () => {
-  // Rao adds the synthetic evidence note and opens a question.
+  // Rao adds the published-reference evidence brief and opens a question.
   await rao.goto(url("/research"));
-  await rao.getByLabel("Source title").fill("Synthetic audit note: new-case preparation completeness");
-  await rao.getByLabel("Citation").fill("Fictional Department Audit Group. Completeness of new-case preparation. Synthetic teaching note, 2026.");
-  await rao.getByLabel("Evidence file (PDF, optional)").setInputFiles(input("research-preparation-audit"));
+  await rao.getByLabel("Source title").fill("ELN 2022 AML recommendations — evidence brief");
+  await rao.getByLabel("Citation").fill("Döhner et al. Blood 2022;140:1345–1377. https://pubmed.ncbi.nlm.nih.gov/35797463/");
+  await rao.getByLabel("Evidence file (PDF, optional)").setInputFiles(input("eln-aml-2022"));
   await rao.getByRole("button", { name: "Add source" }).click();
   await announced(rao, "Evidence source added");
   await expect(rao.getByTestId("evidence-library")).toContainText("citable passages");
-  await rao.getByRole("button", { name: "Insert fictional question 1" }).click();
+  await rao.getByRole("button", { name: "Insert demo question 1" }).click();
   await rao.getByRole("button", { name: "Open question" }).click();
   await rao.waitForURL(/\/research\/[0-9a-f-]{36}$/);
   s.question = idFromUrl(rao);
 
   // Structured appraisal citing an exact passage, submitted to the independent reviewer.
-  await rao.getByRole("button", { name: "Insert fictional appraisal 1" }).click();
+  await rao.getByRole("button", { name: "Insert evidence appraisal example 1" }).click();
   await rao.getByLabel(/^Finding 1:/).check();
   await rao.getByRole("button", { name: "Save and submit for independent review" }).click();
   await announced(rao, "submitted for independent review");
@@ -117,7 +117,7 @@ test("F1 · research question, cited appraisal, disagreement resolved by an inde
   await rao.getByRole("button", { name: "Open successor revision" }).click();
   await announced(rao, "Successor draft opened");
   const editor = rao.getByTestId("appraisal-editor");
-  await editor.getByLabel("Limitations").fill("No comparison group; invented single-site data; the direction of any association is unknown.");
+  await editor.getByLabel("Limitations", { exact: true }).fill("Expert recommendations, not a comparative study; the full guideline tables were not appraised. Current evidence and local applicability require further review.");
   await editor.getByRole("button", { name: "Save and submit for independent review" }).click();
   await announced(rao, "submitted for independent review");
   await reviewerDecides(sen, `/research/${s.question}`, "Approve", "Limitations are now stated plainly.");
@@ -198,7 +198,7 @@ test("F2 · Mira registers Meera and reviews separately sourced reports; Rao ass
   await expect(mira.getByTestId("observations")).toContainText("Karyotype");
 
   // The final molecular report is expected, owned, and not implied to be ordered.
-  await mira.goto(url(`/patients/${s.meera}`));
+  await mira.goto(url(`/patients/${s.meera}/sources`));
   await mira.getByLabel("What is expected").fill("Final molecular report");
   await mira.getByLabel("Next action").fill("Check with the genetics laboratory on Day 8");
   await mira.getByRole("button", { name: "Record expected input" }).click();
@@ -208,16 +208,19 @@ test("F2 · Mira registers Meera and reviews separately sourced reports; Rao ass
   // Coordinator cannot record a clinical assessment (no form); the treating clinician does.
   await expect(mira.getByLabel("Assessment narrative")).toHaveCount(0);
   await rao.goto(url(`/patients/${s.meera}`));
+  await rao.getByText("Update clinical assessment", { exact: true }).click();
   await rao.getByLabel("Assessment narrative").fill("Fictional encounter assessment: profile reviewed with the patient; final molecular classification outstanding.");
   await rao.getByLabel("Stated uncertainty (optional)").fill("Final molecular report outstanding.");
   await rao.getByRole("button", { name: "Record assessment" }).click();
   await announced(rao, "Assessment recorded");
   // Six-dimensional longitudinal profile with distinct result states and explicit gaps.
-  await expect(rao.getByTestId("dimensions").locator("section")).toHaveCount(6);
+  await expect(rao.getByTestId("dimensions").locator("section")).toHaveCount(5);
   await expect(rao.getByTestId("dimension-biology")).toContainText("insufficient sample");
   await expect(rao.getByTestId("dimension-fitness")).toContainText("not reported");
-  await expect(rao.getByTestId("dimension-extent")).toContainText("not assumed normal");
-  await expect(rao.getByTestId("unresolved")).toContainText("Final molecular report");
+  await expect(rao.getByTestId("disease-burden")).toContainText("not inferred");
+  await expect(rao.getByTestId("patient-overview")).toContainText("Final molecular report");
+  await expect(rao.getByTestId("cutoff")).toHaveCount(0);
+  await expect(rao.getByTestId("unresolved")).toHaveCount(0);
 });
 
 test("F3 · applicability, patient discussion, an operational exception and exact plan approval", async () => {
@@ -415,6 +418,7 @@ test("F4 · routine follow-up: a new result is reviewed, then the same plan cont
   await expect(rao.getByTestId("trends")).toContainText("Day 6: 7.9 g/dL");
   await expect(rao.getByTestId("episode-status")).toContainText("ongoing");
   await expect(rao.getByTestId("timeline").locator("li[data-lane='actual']")).toHaveCount(1);
+  await rao.getByText("Clinical and care timeline", { exact: true }).click();
   await expect(rao.getByTestId("timeline").locator("li[data-lane='planned']").first()).toBeVisible();
 });
 
@@ -432,18 +436,18 @@ test("F5 · protocol v2: two separate impacts; Meera retains v1, Arun adopts thr
 
   // New question and evidence for the change (UI), then change proposal → v2.
   await rao.goto(url("/research"));
-  await rao.getByLabel("Source title").fill("Synthetic audit note: caregiver contact confirmation");
-  await rao.getByLabel("Citation").fill("Fictional Department Audit Group. Caregiver contact confirmation and handoff delays. Synthetic teaching note, 2026.");
-  await rao.getByLabel("Evidence file (PDF, optional)").setInputFiles(input("research-caregiver-contact"));
+  await rao.getByLabel("Source title").fill("VIALE-A — randomized-trial appraisal brief");
+  await rao.getByLabel("Citation").fill("DiNardo et al. N Engl J Med 2020;383:617–629. https://pubmed.ncbi.nlm.nih.gov/32786187/");
+  await rao.getByLabel("Evidence file (PDF, optional)").setInputFiles(input("viale-a-2020"));
   await rao.getByRole("button", { name: "Add source" }).click();
   await announced(rao, "Evidence source added");
-  await rao.getByRole("button", { name: "Insert fictional question 2" }).click();
+  await rao.getByRole("button", { name: "Insert demo question 2" }).click();
   await rao.getByRole("button", { name: "Open question" }).click();
   await rao.waitForURL(/\/research\/[0-9a-f-]{36}$/);
   const question2 = idFromUrl(rao);
-  await rao.getByRole("button", { name: "Insert fictional appraisal 2" }).click();
-  await rao.getByTestId("passages").getByLabel("Evidence source").selectOption({ label: "Synthetic audit note: caregiver contact confirmation (v1)" });
-  await rao.getByLabel(/^Finding 1: Handoffs with a confirmed caregiver/).check();
+  await rao.getByRole("button", { name: "Insert evidence appraisal example 2" }).click();
+  await rao.getByTestId("passages").getByLabel("Evidence source").selectOption({ label: "VIALE-A — randomized-trial appraisal brief (v1)" });
+  await rao.getByLabel(/^Finding 1:/).check();
   await rao.getByRole("button", { name: "Save and submit for independent review" }).click();
   await announced(rao, "submitted for independent review");
   await reviewerDecides(sen, `/research/${question2}`, "Approve");
@@ -452,12 +456,12 @@ test("F5 · protocol v2: two separate impacts; Meera retains v1, Arun adopts thr
   await expect(rao.getByTestId("impacts-open")).toContainText("No open impact reviews.");
 
   await rao.goto(url(`/department/protocols/${s.protocol}`));
-  await rao.getByLabel("Rationale / reason").fill("Add caregiver contact confirmation before handoff.");
+  await rao.getByLabel("Rationale / reason").fill("Add individual-context review before interpreting trial evidence.");
   await rao.getByRole("button", { name: "Open change proposal (successor draft)" }).click();
   await rao.waitForURL((u) => u.pathname.includes("/department/protocols/") && !u.pathname.endsWith(s.protocol));
   s.protocol2 = idFromUrl(rao);
   await rao.getByRole("button", { name: "Insert fictional pathway requirements (v2)" }).click();
-  await expect(rao.getByTestId("requirement-REQ-CAREGIVER")).toBeVisible();
+  await expect(rao.getByTestId("requirement-REQ-TRIAL-CONTEXT")).toBeVisible();
   for (const box of await rao.getByTestId("evidence-picker").getByRole("checkbox").all()) await box.check();
   await rao.getByRole("button", { name: "Save and submit for independent review" }).click();
   await announced(rao, "submitted for independent review");
@@ -497,7 +501,7 @@ test("F5 · protocol v2: two separate impacts; Meera retains v1, Arun adopts thr
   await expect(rao.getByTestId("plan-currency")).toContainText("review needed");
   await rao.getByRole("button", { name: "Start applicability review" }).click();
   await announced(rao, "Applicability draft started");
-  await setCriteria(rao, { "REQ-IDENTITY": "match", "REQ-CONTEXT": "match", "REQ-DISCUSSION": "match", "REQ-VENUE": "match", "REQ-MOLECULAR": "unknown", "REQ-CAREGIVER": "match" });
+  await setCriteria(rao, { "REQ-IDENTITY": "match", "REQ-CONTEXT": "match", "REQ-DISCUSSION": "match", "REQ-VENUE": "match", "REQ-MOLECULAR": "unknown", "REQ-TRIAL-CONTEXT": "match" });
   await rao.getByRole("button", { name: "Accept applicability review" }).click();
   await announced(rao, "Applicability review accepted");
   await rao.getByRole("button", { name: "Draft a successor plan version" }).click();
@@ -564,6 +568,7 @@ test("F6 · a source correction opens a scoped impact, blocks the stale action a
   // AE2: the current profile shows the correction; the earlier knowledge snapshot does not.
   await rao.goto(url(`/patients/${s.meera}`));
   await expect(rao.getByTestId("dimension-biology")).toContainText("80 %");
+  await rao.goto(url(`/patients/${s.meera}/history`));
   await rao.getByLabel("Show the profile as it was known at").selectOption(String(before.knowledge_cutoff_seq > 0 ? (await raoApi.get(`${W(ws)}/patients/${s.meera}/snapshots`))[0].knowledge_cutoff_seq : ""));
   await expect(rao.getByTestId("cutoff")).toContainText("Historical view");
   await expect(rao.getByTestId("dimension-biology")).toContainText("90 %");
@@ -592,6 +597,7 @@ test("after an API server restart and fresh browser sessions, the whole journey 
   await expect(fresh.getByTestId("work-exception")).toContainText("Clinical exception awaiting your decision: REQ-MOLECULAR");
   await fresh.goto(url(`/patients/${s.meera}`));
   await expect(fresh.getByTestId("episode-status")).toContainText("ongoing");
+  await fresh.goto(url(`/patients/${s.meera}/sources`));
   await expect(fresh.getByTestId("expected-inputs")).toContainText("Final molecular report");
   await expect(fresh.getByTestId("expected-inputs")).toContainText("pending");
   await fresh.goto(url(`/patients/${s.meera}/care`));

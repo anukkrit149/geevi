@@ -78,4 +78,5 @@ class PlanView(BaseModel):
     currency: Currency
     gates: list[GateResult]
     packet_changes: list[dict[str, Any]]
+    decision_context: dict[str, Any]
     signature_notice: str = "Signatures are demonstration records by fictional development identities, not verified institutional signatures."
