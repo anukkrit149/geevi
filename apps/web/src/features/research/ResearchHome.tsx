@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Books, Chats, Files, Plus } from "@phosphor-icons/react";
 import { useRef, useState } from "react";
 import { Badge, Button, Card, Empty, ErrorSummary, Select, TextArea, TextInput } from "@/components/ui";
 import { ReferencePack } from "./ReferencePack";
@@ -24,6 +25,12 @@ export function ResearchHome({ workspaceId, patientId }: { workspaceId: string; 
   const [q, setQ] = useState({ title: "", question: "", scope: "", intended_use: "" });
   const [src, setSrc] = useState({ title: "", citation: "", source_label: "public_reference" });
   const [search, setSearch] = useState("");
+  const [section, setSection] = useState<"references" | "questions" | "library">(patientId ? "references" : "questions");
+  function focusQuestion() {
+    setSection("questions");
+    requestAnimationFrame(() => document.querySelector<HTMLInputElement>('[data-testid="question-form"] input')?.focus());
+  }
+  const library = sources.data?.filter((s) => `${s.title} ${s.citation}`.toLowerCase().includes(search.toLowerCase())) ?? [];
 
   async function createQuestion() {
     const done = await action.run("question", (command_id) => api.POST("/api/v1/workspaces/{workspace_id}/research/questions", { params: { path: ws }, body: { command_id, ...q, origin: patientId ? { patient_id: patientId, kind: "case_question" } : null } }), "Research question opened");
@@ -42,12 +49,17 @@ export function ResearchHome({ workspaceId, patientId }: { workspaceId: string; 
 
   return (
     <>
-      <div className="page-head"><div><h1>Research</h1><p>Questions, cited evidence and independently reviewed appraisals. Accepting evidence publishes no protocol and recommends nothing for any patient.</p></div></div>
+      <div className="page-head"><div><h1>Research</h1><p>Explore evidence, ask a focused question and follow its review.</p></div>{can("evidence.author") ? <Button variant="primary" onClick={focusQuestion}><Plus aria-hidden="true" />New question</Button> : null}</div>
       <ErrorSummary error={action.error} onDismiss={action.clearError} />
       {patientId ? <Card title="Research linked to this case"><p>The question will keep a link to this patient. Evidence acceptance still requires a separate applicability review before it can inform a patient plan.</p><Link href={`/w/${workspaceId}/patients/${patientId}`}>Return to patient profile</Link></Card> : null}
-      <ReferencePack workspaceId={workspaceId} onQuestion={(question) => { setQ(question); document.querySelector('[data-testid="question-form"]')?.scrollIntoView({ block: "start" }); }} />
+      <div className="research-tabs" role="group" aria-label="Research view">{([{ key: "questions", label: "Questions", icon: Chats }, { key: "references", label: "Published references", icon: Books }, { key: "library", label: "Evidence library", icon: Files }] as const).map(({ key, label, icon: Icon }) => <button className="filter-chip" key={key} aria-pressed={section === key} aria-controls={`research-${key}`} onClick={() => setSection(key)}><Icon size={18} aria-hidden="true" />{label}</button>)}</div>
+      <p className="research-note">Accepting evidence publishes no protocol and recommends nothing for any patient.</p>
+      <div id="research-references" hidden={section !== "references"}>
+      <ReferencePack workspaceId={workspaceId} onQuestion={(question) => { setQ(question); focusQuestion(); }} />
+      </div>
+      <div id="research-questions" hidden={section !== "questions"}>
       <Card title="Research questions" testId="questions">
-        {questions.data?.length ? questions.data.map((item) => (
+        {questions.isLoading ? <p className="small" role="status">Loading research questions…</p> : questions.error ? <p role="alert">Research questions could not be loaded. <Button onClick={() => questions.refetch()}>Try again</Button></p> : questions.data?.length ? questions.data.map((item) => (
           <div className="item" key={item.id}>
             <div className="row"><Link className="item-title" href={`/w/${workspaceId}/research/${item.id}`}>{item.title}</Link><Badge value={item.status === "open" ? "open" : "closed"} label={item.conclusion ? words(item.conclusion) : item.status} /></div>
             <p className="small">Owner {item.owner_name} · intended use: {item.intended_use}</p>
@@ -55,7 +67,7 @@ export function ResearchHome({ workspaceId, patientId }: { workspaceId: string; 
         )) : <Empty>No research questions yet.</Empty>}
       </Card>
       {can("evidence.author") ? (
-        <div className="grid grid-2">
+        <div>
           <Card title="Open a research question" testId="question-form">
             {scenario.data ? (
               <div className="row">
@@ -74,16 +86,18 @@ export function ResearchHome({ workspaceId, patientId }: { workspaceId: string; 
           </Card>
         </div>
       ) : null}
+      </div>
+      <div id="research-library" hidden={section !== "library"}>
           <Card title="Evidence library" testId="evidence-library">
             <TextInput label="Find an evidence document" value={search} onChange={setSearch} hint="Search title, citation or publication identifier." />
-            {sources.data?.length ? sources.data.filter((s) => `${s.title} ${s.citation}`.toLowerCase().includes(search.toLowerCase())).map((item) => (
+            {sources.isLoading ? <p role="status">Loading evidence library…</p> : sources.error ? <p role="alert">Evidence library could not be loaded. <Button onClick={() => sources.refetch()}>Try again</Button></p> : library.length ? library.map((item) => (
               <div className="item" key={item.id}>
                 <div className="row"><Link href={`/w/${workspaceId}/research/sources/${item.id}`}>{item.title}</Link><Badge value={item.status === "active" ? "current" : item.status} label={`v${item.version_no} · ${item.status}`} /><Badge value="reviewed" label={words(item.source_label)} /></div>
                 <p className="small">{item.citation}</p>
                 <div className="row"><Link href={`/w/${workspaceId}/research/sources/${item.id}`}>Open evidence document and passages</Link>{citationUrl(item.citation) ? <a href={citationUrl(item.citation)!} target="_blank" rel="noreferrer">Original publication</a> : null}</div>
                 <p className="small">{item.passages.length} citable passages{item.sha256 ? ` · sha256 ${item.sha256.slice(0, 12)}…` : " · citation only"}</p>
               </div>
-            )) : <Empty>No evidence sources yet.</Empty>}
+            )) : <Empty>{search ? "No evidence documents match your search. Try a different title or citation." : "No evidence sources yet. Add a source or import a brief from Published references."}</Empty>}
             {can("evidence.author") ? <form onSubmit={(e) => { e.preventDefault(); void addSource(); }}>
               <fieldset>
                 <legend>Add an evidence source</legend>
@@ -95,6 +109,7 @@ export function ResearchHome({ workspaceId, patientId }: { workspaceId: string; 
               </fieldset>
             </form> : null}
           </Card>
+      </div>
     </>
   );
 }

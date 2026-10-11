@@ -1,0 +1,50 @@
+/* Geevi / Ink and Cobalt. Semantic palette; visual preferences never store record data.
+ * good-css: OKLCH, light-dark(), derived tints, fluid sizes, logical properties.
+ * Layers: content 0, navigation 10, mobile menu 20, notification 30; dialogs use the top layer.
+ */
+:root {
+  color-scheme: light dark;
+  --brand: oklch(48% .135 255);
+  --accent: light-dark(var(--brand), oklch(79% .09 255));
+  --accent-ink: light-dark(oklch(99% 0 none), oklch(20% .025 255));
+  --paper: light-dark(oklch(97.4% .002 255), oklch(18% .009 255));
+  --surface: light-dark(oklch(99.8% 0 none), oklch(22% .012 255));
+  --surface-raised: light-dark(oklch(99.8% 0 none), oklch(26% .013 255));
+  --ink: light-dark(oklch(27% .012 255), oklch(95% .006 255));
+  --ink-soft: light-dark(oklch(45% .016 255), oklch(76% .016 255));
+  --line: light-dark(oklch(90% .006 255), oklch(33% .015 255));
+  --line-strong: light-dark(oklch(62% .02 255), oklch(57% .02 255));
+  --accent-soft: color-mix(in oklch, var(--accent) 7%, var(--surface));
+  --accent-hover: color-mix(in oklch, var(--accent) 86%, var(--ink));
+  --muted-soft: color-mix(in oklch, var(--ink) 4%, var(--surface));
+  --good: light-dark(oklch(43% .1 152), oklch(80% .12 152));
+  --warn: light-dark(oklch(45% .11 66), oklch(82% .12 76));
+  --bad: light-dark(oklch(47% .17 26), oklch(80% .1 26));
+  --info: light-dark(oklch(44% .105 251), oklch(80% .09 251));
+  --good-soft: color-mix(in oklch, var(--good) 9%, var(--surface));
+  --warn-soft: color-mix(in oklch, var(--warn) 9%, var(--surface));
+  --bad-soft: color-mix(in oklch, var(--bad) 9%, var(--surface));
+  --info-soft: color-mix(in oklch, var(--info) 9%, var(--surface));
+  --radius-sm: .5rem;
+  --radius: .875rem;
+  --radius-lg: 1.25rem;
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --gutter: clamp(1rem, .15rem + 2vw, 2.75rem);
+  --text-title: clamp(1.7rem, 1.4rem + .7vw, 2.25rem);
+  --text-display: clamp(2.5rem, 1.6rem + 2.4vw, 4rem);
+  --shadow: 0 .25rem 1rem color-mix(in oklch, var(--ink) 4%, transparent);
+  --shadow-float: 0 1.25rem 4rem color-mix(in oklch, var(--ink) 16%, transparent);
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --duration-press: 130ms;
+  --duration-enter: 240ms;
+  --layer-nav: 10;
+  --layer-menu: 20;
+  --layer-toast: 30;
+}
+[data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }

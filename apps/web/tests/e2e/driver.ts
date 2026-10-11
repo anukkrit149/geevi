@@ -70,9 +70,13 @@ export async function login(page: Page, user: User, destination = "/login"): Pro
   await page.goto(destination);
   await expect(page.locator("form[data-ready='true']")).toBeVisible();
   await page.getByLabel("Username").fill(user);
-  await page.getByLabel("Password").fill(credentials()[user]);
+  await page.getByLabel("Password", { exact: true }).fill(credentials()[user]);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  const menu = page.getByRole("button", { name: "Open navigation", exact: true });
+  const compact = (page.viewportSize()?.width ?? 1360) < 768;
+  if (compact) await menu.click();
   await expect(page.getByTestId("identity")).toBeVisible();
+  if (compact) await page.getByRole("button", { name: "Close navigation", exact: true }).click();
 }
 
 export async function newWorkspace(name: string, load: "none" | "patients" | "sources" = "none"): Promise<{ ws: string; patients: Record<string, string> }> {

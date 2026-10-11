@@ -45,6 +45,7 @@ async function verifyAll(page: Page): Promise<number> {
 
 async function receive(page: Page, patient: string, fixture: string, kind: string, title: string): Promise<void> {
   await page.goto(url(`/patients/${patient}/sources`));
+  await page.getByRole("tab", { name: "All sections", exact: true }).click();
   await page.getByLabel("Original file").setInputFiles(input(fixture));
   await page.getByLabel("Report type", { exact: true }).selectOption(kind);
   await page.getByRole("button", { name: "Receive document" }).click();
@@ -82,12 +83,14 @@ test.beforeAll(async ({ browser }) => {
 test("F1 · research question, cited appraisal, disagreement resolved by an independent reviewer", async () => {
   // Rao adds the published-reference evidence brief and opens a question.
   await rao.goto(url("/research"));
+  await rao.getByRole("button", { name: "Evidence library", exact: true }).click();
   await rao.getByLabel("Source title").fill("ELN 2022 AML recommendations — evidence brief");
   await rao.getByLabel("Citation").fill("Döhner et al. Blood 2022;140:1345–1377. https://pubmed.ncbi.nlm.nih.gov/35797463/");
   await rao.getByLabel("Evidence file (PDF, optional)").setInputFiles(input("eln-aml-2022"));
   await rao.getByRole("button", { name: "Add source" }).click();
   await announced(rao, "Evidence source added");
   await expect(rao.getByTestId("evidence-library")).toContainText("citable passages");
+  await rao.getByRole("button", { name: "Questions", exact: true }).click();
   await rao.getByRole("button", { name: "Insert demo question 1" }).click();
   await rao.getByRole("button", { name: "Open question" }).click();
   await rao.waitForURL(/\/research\/[0-9a-f-]{36}$/);
@@ -186,7 +189,7 @@ test("F2 · Mira registers Meera and reviews separately sourced reports; Rao ass
   await dialog.getByLabel("Identifier value").fill("GEEVI-DEMO-0001");
   await dialog.getByRole("button", { name: "Register", exact: true }).click();
   await announced(mira, "Patient registered");
-  await mira.getByRole("link", { name: "Meera (fictional)" }).click();
+  await mira.getByRole("link", { name: "Meera (fictional)", exact: true }).click();
   await mira.waitForURL(/\/patients\/[0-9a-f-]{36}$/);
   s.meera = idFromUrl(mira);
 
@@ -199,6 +202,7 @@ test("F2 · Mira registers Meera and reviews separately sourced reports; Rao ass
 
   // The final molecular report is expected, owned, and not implied to be ordered.
   await mira.goto(url(`/patients/${s.meera}/sources`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByLabel("What is expected").fill("Final molecular report");
   await mira.getByLabel("Next action").fill("Check with the genetics laboratory on Day 8");
   await mira.getByRole("button", { name: "Record expected input" }).click();
@@ -217,7 +221,7 @@ test("F2 · Mira registers Meera and reviews separately sourced reports; Rao ass
   await expect(rao.getByTestId("dimensions").locator("section")).toHaveCount(5);
   await expect(rao.getByTestId("dimension-biology")).toContainText("insufficient sample");
   await expect(rao.getByTestId("dimension-fitness")).toContainText("not reported");
-  await expect(rao.getByTestId("disease-burden")).toContainText("not inferred");
+  await expect(rao.getByTestId("disease-burden")).toContainText("No stage or remission category is inferred");
   await expect(rao.getByTestId("patient-overview")).toContainText("Final molecular report");
   await expect(rao.getByTestId("cutoff")).toHaveCount(0);
   await expect(rao.getByTestId("unresolved")).toHaveCount(0);
@@ -225,6 +229,7 @@ test("F2 · Mira registers Meera and reviews separately sourced reports; Rao ass
 
 test("F3 · applicability, patient discussion, an operational exception and exact plan approval", async () => {
   await mira.goto(url(`/patients/${s.meera}/decisions`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByLabel("Participants (comma separated)").fill("Meera (patient), Sister (caregiver), Mira");
   await mira.getByLabel("Goals in the patient's or caregiver's words").fill("Wants appointments close to home where possible.");
   await mira.getByLabel("Preferences and practical constraints").fill("Prefers the satellite clinic; long travel to the main campus.");
@@ -233,6 +238,7 @@ test("F3 · applicability, patient discussion, an operational exception and exac
   await expect(mira.getByRole("button", { name: "Start applicability review" })).toHaveCount(0); // not a coordinator action
 
   await rao.goto(url(`/patients/${s.meera}/decisions`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await rao.getByRole("button", { name: "Start applicability review" }).click();
   await announced(rao, "Applicability draft started");
   await setCriteria(rao, { "REQ-IDENTITY": "match", "REQ-CONTEXT": "match", "REQ-DISCUSSION": "match", "REQ-VENUE": "difference", "REQ-MOLECULAR": "unknown" });
@@ -270,6 +276,7 @@ test("F3 · applicability, patient discussion, an operational exception and exac
   await announced(rao, "Exception decision recorded: approve");
   await expect(rao.getByTestId("exception-REQ-MOLECULAR-pending")).toContainText("approvals 1 of 2");
   await mira.goto(url(`/patients/${s.meera}/decisions`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(mira.getByTestId("exception-REQ-MOLECULAR-pending")).toContainText("Awaiting 1 more decision");
   await expect(mira.getByRole("button", { name: "Approve exception" })).toHaveCount(0);
 
@@ -303,6 +310,7 @@ test("F3 · applicability, patient discussion, an operational exception and exac
 
 test("F4 · SOP-derived handoffs, attributed actual care and a concern", async () => {
   await mira.goto(url(`/patients/${s.meera}/care`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByRole("button", { name: "Create tasks from the SOP" }).click();
   await announced(mira, "SOP tasks created");
   await expect(mira.locator("[data-testid^='task-STEP-']")).toHaveCount(4);
@@ -323,7 +331,7 @@ test("F4 · SOP-derived handoffs, attributed actual care and a concern", async (
   await isha.goto(url("/today"));
   await expect(isha.getByTestId("work-task")).toContainText("Receive or accept the handoff");
   await isha.getByTestId("work-task").getByRole("link").first().click();
-  await isha.waitForURL(/\/care$/);
+  await isha.waitForURL(/\/care#tasks$/);
   const venue = isha.getByTestId("task-STEP-CONFIRM-VENUE");
   await venue.getByRole("link", { name: /Case preparation and handoff SOP/ }).click();
   await expect(isha.getByTestId("step-STEP-CONFIRM-VENUE")).toContainText("Confirmation note naming who was contacted");
@@ -335,6 +343,7 @@ test("F4 · SOP-derived handoffs, attributed actual care and a concern", async (
   await expect(isha.getByTestId("task-status-STEP-CONFIRM-VENUE")).toContainText("completed");
 
   // Scheduling is not delivery.
+  await isha.getByRole("tab", { name: "All sections", exact: true }).click();
   const planned = isha.getByTestId("planned-events");
   await planned.getByLabel("What is scheduled").fill("Preparation visit at the satellite clinic");
   await planned.getByLabel("Scheduled for (relative day)").fill("3");
@@ -355,11 +364,13 @@ test("F4 · SOP-derived handoffs, attributed actual care and a concern", async (
   // A concern: acknowledged is not responded; then response and clinician review.
   const concerns = mira.getByTestId("concerns");
   await mira.goto(url(`/patients/${s.meera}/care`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await concerns.getByLabel("Concern as reported").fill("Caregiver phoned: worried about transport to the satellite clinic next week.");
   await concerns.getByLabel("Reported by").selectOption("caregiver");
   await concerns.getByRole("button", { name: "Record concern" }).click();
   await announced(mira, "Concern recorded");
   await isha.goto(url(`/patients/${s.meera}/care`));
+  await isha.getByRole("tab", { name: "All sections", exact: true }).click();
   await isha.getByTestId("concerns").getByRole("button", { name: "Acknowledge" }).click();
   await expect(isha.getByTestId("concern-status")).toContainText("acknowledged");
   await expect(isha.getByTestId("concern")).toContainText("an acknowledgement is not a response");
@@ -367,6 +378,7 @@ test("F4 · SOP-derived handoffs, attributed actual care and a concern", async (
   await isha.getByTestId("concerns").getByRole("button", { name: "Record response" }).click();
   await expect(isha.getByTestId("concern-status")).toContainText("responded");
   await rao.goto(url(`/patients/${s.meera}/care`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await rao.getByTestId("concerns").getByLabel("Response / review note").fill("Reviewed; response is adequate. No change to the plan.");
   await rao.getByTestId("concerns").getByRole("button", { name: "Review and close" }).click();
   await expect(rao.getByTestId("concern-status")).toContainText("closed");
@@ -375,6 +387,7 @@ test("F4 · SOP-derived handoffs, attributed actual care and a concern", async (
 test("F4 · routine follow-up: a new result is reviewed, then the same plan continues unchanged", async () => {
   // Mira schedules the authored follow-up (administrative) and receives the follow-up blood panel.
   await mira.goto(url(`/patients/${s.meera}/care`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   const followUps = mira.getByTestId("follow-ups");
   await followUps.getByLabel("Appointment (relative day)").fill("14");
   await followUps.getByRole("button", { name: "Schedule", exact: true }).click();
@@ -384,6 +397,7 @@ test("F4 · routine follow-up: a new result is reviewed, then the same plan cont
 
   // The new result is unclassified clinical material: an unchanged continuation is blocked until Rao reviews it.
   await rao.goto(url(`/patients/${s.meera}/care`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   const decision = rao.getByTestId("encounter-decision");
   await decision.getByLabel("Rationale").fill("Routine review at the scheduled visit; the documented plan continues unchanged.");
   await decision.getByLabel("Next clinical timing (day)").fill("28");
@@ -411,6 +425,7 @@ test("F4 · routine follow-up: a new result is reviewed, then the same plan cont
   await expect(rao.getByTestId("follow-up-open")).toContainText("Clinical timing: Day 28");
   // Same plan, same signature; trend shows both panels; the episode stays ongoing.
   await rao.goto(url(`/patients/${s.meera}/decisions`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-current")).toContainText("Plan version 1");
   await expect(rao.getByTestId("plan-digest")).toHaveText(s.digest);
   await rao.goto(url(`/patients/${s.meera}`));
@@ -432,15 +447,18 @@ test("F5 · protocol v2: two separate impacts; Meera retains v1, Arun adopts thr
   await submitPlan(ws, s.arunPlan);
   await signPlan(ws, s.arunPlan);
   await rao.goto(url(`/patients/${s.arun}/decisions`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-current").getByRole("link", { name: "Open pinned protocol version" })).toHaveAttribute("href", new RegExp(s.protocol));
 
   // New question and evidence for the change (UI), then change proposal → v2.
   await rao.goto(url("/research"));
+  await rao.getByRole("button", { name: "Evidence library", exact: true }).click();
   await rao.getByLabel("Source title").fill("VIALE-A — randomized-trial appraisal brief");
   await rao.getByLabel("Citation").fill("DiNardo et al. N Engl J Med 2020;383:617–629. https://pubmed.ncbi.nlm.nih.gov/32786187/");
   await rao.getByLabel("Evidence file (PDF, optional)").setInputFiles(input("viale-a-2020"));
   await rao.getByRole("button", { name: "Add source" }).click();
   await announced(rao, "Evidence source added");
+  await rao.getByRole("button", { name: "Questions", exact: true }).click();
   await rao.getByRole("button", { name: "Insert demo question 2" }).click();
   await rao.getByRole("button", { name: "Open question" }).click();
   await rao.waitForURL(/\/research\/[0-9a-f-]{36}$/);
@@ -498,6 +516,7 @@ test("F5 · protocol v2: two separate impacts; Meera retains v1, Arun adopts thr
   await errorCode(rao, "adoption_requires_approved_plan");
 
   await rao.goto(url(`/patients/${s.arun}/decisions`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-currency")).toContainText("review needed");
   await rao.getByRole("button", { name: "Start applicability review" }).click();
   await announced(rao, "Applicability draft started");
@@ -524,6 +543,7 @@ test("F5 · protocol v2: two separate impacts; Meera retains v1, Arun adopts thr
   await expect(rao.getByTestId("impacts-open")).toContainText("No open impact reviews.");
   // Meera's plan still pins v1 with the original signature.
   await rao.goto(url(`/patients/${s.meera}/decisions`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-digest")).toHaveText(s.digest);
   await expect(rao.getByTestId("plan-currency")).toContainText("review current");
 });
@@ -536,10 +556,12 @@ test("F6 · a source correction opens a scoped impact, blocks the stale action a
 
   // The signed plan stays in force but is review-needed; a dependent new handoff is blocked.
   await mira.goto(url(`/patients/${s.meera}/care`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByTestId("task-STEP-FOLLOWUP").getByRole("button", { name: "Send handoff" }).click();
   await errorCode(mira, "plan_review_needed");
   // Historical care stays recordable.
   await isha.goto(url(`/patients/${s.meera}/care`));
+  await isha.getByRole("tab", { name: "All sections", exact: true }).click();
   const care = isha.getByTestId("care-events");
   await care.getByLabel("Status", { exact: true }).selectOption("performed");
   await care.getByLabel("Actual time (relative day)").fill("4");
@@ -548,6 +570,7 @@ test("F6 · a source correction opens a scoped impact, blocks the stale action a
   await announced(isha, "Care record saved");
 
   await rao.goto(url(`/patients/${s.meera}/decisions`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-currency")).toContainText("review needed");
   await expect(rao.getByTestId("plan-disposition")).toContainText("active");
   await expect(rao.getByTestId("plan-digest")).toHaveText(s.digest); // the signature and its history are retained
@@ -562,6 +585,7 @@ test("F6 · a source correction opens a scoped impact, blocks the stale action a
   await announced(rao, "Impact disposition recorded");
 
   await mira.goto(url(`/patients/${s.meera}/care`));
+  await mira.getByRole("tab", { name: "All sections", exact: true }).click();
   await mira.getByTestId("task-STEP-FOLLOWUP").getByRole("button", { name: "Send handoff" }).click();
   await expect(mira.getByTestId("task-status-STEP-FOLLOWUP")).toContainText("sent");
 
@@ -585,10 +609,12 @@ test("after an API server restart and fresh browser sessions, the whole journey 
 
   // Server-side sessions are in PostgreSQL too: an existing browser session keeps working after the restart.
   await rao.goto(url(`/patients/${s.meera}/decisions`));
+  await rao.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(rao.getByTestId("plan-digest")).toHaveText(s.digest);
   // Brand-new browser contexts (a "browser restart") see the same durable state.
   const fresh = await signIn(browser, "sen");
   await fresh.goto(url(`/patients/${s.meera}/decisions`));
+  await fresh.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(fresh.getByTestId("plan-digest")).toHaveText(s.digest);
   // Remaining obligations keep an owner and a next action; the episode is ongoing.
   await expect(fresh.getByTestId("exception-REQ-MOLECULAR-pending")).toContainText("Awaiting 1 more decision");
@@ -598,9 +624,11 @@ test("after an API server restart and fresh browser sessions, the whole journey 
   await fresh.goto(url(`/patients/${s.meera}`));
   await expect(fresh.getByTestId("episode-status")).toContainText("ongoing");
   await fresh.goto(url(`/patients/${s.meera}/sources`));
+  await fresh.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(fresh.getByTestId("expected-inputs")).toContainText("Final molecular report");
   await expect(fresh.getByTestId("expected-inputs")).toContainText("pending");
   await fresh.goto(url(`/patients/${s.meera}/care`));
+  await fresh.getByRole("tab", { name: "All sections", exact: true }).click();
   await expect(fresh.getByTestId("follow-up-open")).toContainText("owner Mira");
   await expect(fresh.getByTestId("task-status-STEP-PLANNING-VISIT")).toContainText("draft");
   // The original bytes of a source are still served byte-identically.
